@@ -11,17 +11,22 @@ export function useAnalyzeRegion() {
   const [error, setError] = useState<string | null>(null);
 
   const run = async (payload: AOIRequest) => {
+    console.log("useAnalyzeRegion: Starting analysis with payload:", payload);
+    
     setLoading(true);
     setError(null);
     setResult(null);
 
     try {
       const res = await analyzeRegion(payload);
+      console.log("useAnalyzeRegion: Analysis successful:", res);
       setResult(res);
       return res;
     } catch (e: any) {
-      setError(e.message || "Something went wrong");
-      throw e;
+      console.error("useAnalyzeRegion: Analysis failed:", e);
+      const errorMessage = e.message || "Something went wrong during analysis";
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }

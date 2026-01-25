@@ -2,7 +2,39 @@ import { NextResponse } from "next/server";
 import type { AOIRequest } from "@/types/geo";
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as AOIRequest;
+  try {
+    console.log("Received analyze request");
+    
+    let body: AOIRequest;
+    try {
+      body = (await req.json()) as AOIRequest;
+      console.log("Request body:", body);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 }
+      );
+    }
+
+    // Validate required fields
+    if (!body.bbox || !body.startDate || !body.endDate) {
+      console.error("Missing required fields:", { bbox: !!body.bbox, startDate: !!body.startDate, endDate: !!body.endDate });
+      return NextResponse.json(
+        { error: "Missing required fields: bbox, startDate, endDate" },
+        { status: 400 }
+      );
+    }
+
+    // Validate bbox structure
+    if (typeof body.bbox.north === 'undefined' || typeof body.bbox.south === 'undefined' || 
+        typeof body.bbox.east === 'undefined' || typeof body.bbox.west === 'undefined') {
+      console.error("Invalid bbox structure:", body.bbox);
+      return NextResponse.json(
+        { error: "Invalid bbox format. Expected: { north, south, east, west }" },
+        { status: 400 }
+      );
+    }
 
   const mock = {
     status: "COMPLETED",
@@ -35,10 +67,18 @@ export async function POST(req: Request) {
         "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?q=80&w=1400&auto=format&fit=crop",
     },
 
-    message: `Mock analysis completed for bbox (${body.bbox.minLat.toFixed(
+    message: `Mock analysis completed for bbox (${body.bbox.south.toFixed(
       3,
-    )}, ${body.bbox.minLon.toFixed(3)})`,
+    )}, ${body.bbox.west.toFixed(3)})`,
   };
 
   return NextResponse.json(mock);
+    
+  } catch (error) {
+    console.error("API route error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
