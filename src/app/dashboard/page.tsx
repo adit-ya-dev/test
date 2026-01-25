@@ -9,28 +9,30 @@ import AlertsPreview from "./components/AlertsPreview";
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       <DashboardHeader />
+      
+      <div className="space-y-6">
+        <StatsCards />
 
-      <StatsCards />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-4">
+            <ThreatLevelCard />
+          </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-4">
-          <ThreatLevelCard />
+          <div className="lg:col-span-8">
+            <NDVITrendChart />
+          </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-8">
-          <NDVITrendChart />
-        </div>
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-8">
+            <RecentScansTable />
+          </div>
 
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-8">
-          <RecentScansTable />
-        </div>
-
-        <div className="col-span-12 lg:col-span-4">
-          <AlertsPreview />
+          <div className="lg:col-span-4">
+            <AlertsPreview />
+          </div>
         </div>
       </div>
     </div>

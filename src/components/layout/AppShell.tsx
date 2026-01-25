@@ -58,11 +58,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#050B16] text-white flex flex-col font-sans">
-      {/* HEADER */}
-      <header className="h-[80px] bg-gradient-to-b from-[#0B1A33] to-[#061225] border-b border-white/10 flex items-center px-6 z-10">
-        <div className="flex-1 hidden md:block"></div>
-
+    <div className="min-h-screen bg-[#050B16] text-white font-sans">
+      {/* FIXED HEADER */}
+      <header className="fixed top-0 left-0 right-0 z-30 h-[80px] bg-gradient-to-b from-[#0B1A33] to-[#061225] border-b border-white/10 flex items-center px-6">
+        <div className="flex-1 hidden md:block" />
         <div className="flex flex-1 items-center justify-center gap-6">
           <div className="relative w-14 h-14">
             <Image
@@ -85,34 +84,43 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => adjustFont("decrease")}
               className="hover:text-blue-400 transition-colors px-1"
+              aria-label="Decrease font size"
             >
               A-
             </button>
             <button
               onClick={() => adjustFont("reset")}
               className="hover:text-blue-400 transition-colors font-bold px-1"
+              aria-label="Reset font size"
             >
               A
             </button>
             <button
               onClick={() => adjustFont("increase")}
               className="hover:text-blue-400 transition-colors px-1"
+              aria-label="Increase font size"
             >
               A+
             </button>
-
             <span className="text-white/20 mx-1">|</span>
-
             {/* Language Buttons */}
             <button
               onClick={() => setLang("en")}
-              className={`transition-colors ${lang === "en" ? "text-blue-400 font-bold" : "text-white/60 hover:text-white"}`}
+              className={`transition-colors ${
+                lang === "en"
+                  ? "text-blue-400 font-bold"
+                  : "text-white/60 hover:text-white"
+              }`}
             >
               English
             </button>
             <button
               onClick={() => setLang("hi")}
-              className={`transition-colors ${lang === "hi" ? "text-blue-400 font-bold" : "text-white/60 hover:text-white"}`}
+              className={`transition-colors ${
+                lang === "hi"
+                  ? "text-blue-400 font-bold"
+                  : "text-white/60 hover:text-white"
+              }`}
             >
               हिन्दी
             </button>
@@ -120,48 +128,50 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <div className="flex flex-1">
-        {/* SIDEBAR */}
-        <aside className="w-[260px] bg-[#071225] border-r border-white/10 flex flex-col">
-          <nav className="p-4 flex flex-col gap-2">
-            {navItems.map((item) => {
-              const active = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all
-                    ${active ? "bg-blue-600/20 border-blue-500/40 text-white" : "border-transparent text-white/70 hover:bg-white/5"}
-                  `}
-                >
-                  <Icon size={18} />
-                  <span className="text-sm font-semibold">
-                    {item.name[lang]}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
+      {/* FIXED SIDEBAR */}
+      <aside className="fixed left-0 top-[80px] bottom-0 z-20 w-[260px] bg-[#071225] border-r border-white/10 flex flex-col">
+        <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
+          {navItems.map((item) => {
+            const active = pathname === item.href;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all
+                  ${
+                    active
+                      ? "bg-blue-600/20 border-blue-500/40 text-white"
+                      : "border-transparent text-white/70 hover:bg-white/5"
+                  }`}
+              >
+                <Icon size={18} />
+                <span className="text-sm font-semibold">{item.name[lang]}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* System Health */}
-          <div className="mt-auto p-4">
-            <div className="bg-[#06101F] border border-white/10 rounded-xl p-4">
-              <p className="text-[10px] uppercase tracking-widest text-white/40 mb-3">
-                {lang === "en" ? "System Health" : "सिस्टम स्थिति"}
-              </p>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-white/60">
-                  {lang === "en" ? "Uplink" : "अपलिंक"}
-                </span>
-                <span className="text-xs font-bold text-green-400">ONLINE</span>
-              </div>
+        {/* System Health - pinned at bottom */}
+        <div className="mt-auto p-4 border-t border-white/10">
+          <div className="bg-[#06101F] border border-white/10 rounded-xl p-4">
+            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-3">
+              {lang === "en" ? "System Health" : "सिस्टम स्थिति"}
+            </p>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-white/60">
+                {lang === "en" ? "Uplink" : "अपलिंक"}
+              </span>
+              <span className="text-xs font-bold text-green-400">ONLINE</span>
             </div>
           </div>
-        </aside>
+        </div>
+      </aside>
 
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
-      </div>
+      {/* MAIN CONTENT - pushed right & below fixed elements */}
+      <main className="ml-[260px] mt-[80px] min-h-[calc(100vh-80px)] p-6 bg-[#050B16] overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }
