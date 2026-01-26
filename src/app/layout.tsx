@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import AppShell from "@/components/layout/AppShell";
 
 export const metadata: Metadata = {
-  title: "Land Guard | Sentinel Eye",
+  title: "Sentinel Eye",
   description: "Cloud-native land-use change detection system",
 };
 
