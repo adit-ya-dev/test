@@ -3,7 +3,20 @@
 @import "leaflet/dist/leaflet.css";
 @import "leaflet-draw/dist/leaflet.draw.css";
 
-/* Theme-aware globals */
+/* Base styles */
+* {
+    border-color: hsl(var(--border));
+}
+
+body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+/* Light theme (default) */
 :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -13,19 +26,21 @@
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 }
 
+/* Dark theme */
 .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -34,7 +49,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
+    --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -42,63 +57,69 @@
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-}
-
-/* Base styles */
-* {
-    @apply border-gray-200 dark:border-gray-700;
+    --ring: 224.3 76.3% 48%;
 }
 
 /* Component styles */
 .card {
-    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-200;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    transition: all 0.2s;
 }
 
 .card:hover {
-    @apply shadow-xl scale-[1.02];
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    transform: scale(1.02);
 }
 
 .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-500 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
 }
 
-.nav-active {
-    @apply bg-blue-600 text-white;
+.btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
 }
 
 /* Status indicators */
 .status-online {
-    @apply text-green-500;
+    color: rgb(34 197 94);
 }
+
 .status-offline {
-    @apply text-red-500;
+    color: rgb(239 68 68);
 }
 
 /* Scrollbar */
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
-}
-
-body {
-    /* Tailwind handles light mode by default, dark: handles the rest */
-    @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 min-h-screen;
-    transition:
-        background-color 0.3s,
-        color 0.3s;
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
 }
 
 /* High contrast text */
 .text-high-contrast {
-    @apply text-slate-900 dark:text-white font-semibold;
+    color: hsl(var(--foreground));
+    font-weight: 600;
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border));
 }
