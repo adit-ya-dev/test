@@ -11,10 +11,10 @@ export default function DataLogsPage() {
   const { logs, total, filters, setFilters, clearAll } = useDataLogs();
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 pb-12">
       <DataLogsHeader total={total} />
 
-      <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+      <div className="flex flex-col xl:flex-row gap-4 xl:items-end">
         <DataLogsFilters filters={filters} onChange={setFilters} />
         <DataLogsActions logs={logs} onClearAll={clearAll} />
       </div>

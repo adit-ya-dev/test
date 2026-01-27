@@ -5,27 +5,40 @@ import Link from "next/link";
 
 export default function DataLogsTable({ logs }: { logs: ScanResult[] }) {
   return (
-    <div className="glass-card rounded-2xl p-5 shadow-xl overflow-hidden">
-      <p className="text-xs uppercase tracking-widest text-white/40">
-        Records Table
+    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm overflow-hidden">
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">
+        Analysis Records
       </p>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-white/10">
+      <div className="overflow-x-auto rounded-xl border border-border bg-background/50">
         <table className="w-full text-sm">
-          <thead className="bg-white/5 text-white/60">
+          <thead className="bg-muted text-muted-foreground border-b border-border">
             <tr>
-              <th className="text-left p-3">Scan ID</th>
-              <th className="text-left p-3">Region</th>
-              <th className="text-left p-3">Severity</th>
-              <th className="text-left p-3">Date</th>
-              <th className="text-left p-3">Action</th>
+              <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
+                Scan ID
+              </th>
+              <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
+                Region
+              </th>
+              <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
+                Severity
+              </th>
+              <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
+                Timestamp
+              </th>
+              <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
+                Action
+              </th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-border">
             {logs.length === 0 ? (
               <tr>
-                <td className="p-4 text-white/60" colSpan={5}>
+                <td
+                  className="p-8 text-center text-muted-foreground font-medium"
+                  colSpan={5}
+                >
                   No scan logs found. Run a scan from Map Analysis first.
                 </td>
               </tr>
@@ -33,31 +46,33 @@ export default function DataLogsTable({ logs }: { logs: ScanResult[] }) {
               logs.map((s) => (
                 <tr
                   key={s.scanId}
-                  className="border-t border-white/10 text-white/80"
+                  className="text-foreground/80 hover:bg-muted/50 transition-colors"
                 >
-                  <td className="p-3 font-semibold">{s.scanId}</td>
-                  <td className="p-3">{s.regionName}</td>
-                  <td className="p-3">
+                  <td className="p-4 font-mono font-bold text-xs">
+                    {s.scanId}
+                  </td>
+                  <td className="p-4 font-semibold">{s.regionName}</td>
+                  <td className="p-4">
                     <span
                       className={[
-                        "px-2 py-1 rounded-full text-xs font-bold border",
+                        "px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tighter",
                         s.severity === "CRITICAL"
-                          ? "bg-red-500/20 text-red-200 border-red-500/30"
+                          ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
                           : s.severity === "WARNING"
-                            ? "bg-yellow-500/20 text-yellow-200 border-yellow-500/30"
-                            : "bg-green-500/20 text-green-200 border-green-500/30",
+                            ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20"
+                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
                       ].join(" ")}
                     >
                       {s.severity}
                     </span>
                   </td>
-                  <td className="p-3 text-white/60">
+                  <td className="p-4 text-muted-foreground text-xs">
                     {new Date(s.createdAt).toLocaleString()}
                   </td>
-                  <td className="p-3">
+                  <td className="p-4">
                     <Link
                       href="/scan-result"
-                      className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs font-bold text-white/80 hover:bg-white/10 transition inline-block"
+                      className="rounded-lg border border-border bg-secondary px-4 py-2 text-[10px] font-black uppercase tracking-widest text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-all inline-block shadow-sm"
                     >
                       View
                     </Link>

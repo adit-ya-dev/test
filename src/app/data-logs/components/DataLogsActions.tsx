@@ -11,17 +11,17 @@ export default function DataLogsActions({
   onClearAll: () => void;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
+    <div className="flex flex-row gap-3">
       <button
         onClick={() => downloadJson(logs, `sentinel-eye-data-logs.json`)}
-        className="glass-card rounded-xl px-4 py-2 text-sm font-bold text-white/80 hover:text-white transition"
+        className="flex-1 sm:flex-none rounded-xl bg-secondary px-6 py-2 text-sm font-black text-secondary-foreground hover:opacity-80 transition border border-border uppercase tracking-widest"
       >
         Export JSON
       </button>
 
       <button
         onClick={onClearAll}
-        className="rounded-xl px-4 py-2 text-sm font-bold bg-red-500/15 text-red-200 border border-red-500/30 hover:bg-red-500/25 transition"
+        className="flex-1 sm:flex-none rounded-xl px-6 py-2 text-sm font-black bg-destructive/10 text-destructive border border-destructive/30 hover:bg-destructive hover:text-destructive-foreground transition uppercase tracking-widest"
       >
         Clear Logs
       </button>
