@@ -1,23 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { AlertItem } from "@/types/alert";
+import type { Alert, AlertSeverity } from "@/types/alert";
+import { generateAlertsFromScans } from "@/lib/alerts/alertGenerator";
+import { getScanHistory } from "@/lib/scans/scanStorage";
 
 export function useAlerts() {
-  const [data, setData] = useState<AlertItem[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [severity, setSeverity] = useState<"ALL" | AlertSeverity>("ALL");
 
   useEffect(() => {
-    async function run() {
-      setLoading(true);
-      const res = await fetch("/api/alerts");
-      const json = await res.json();
-      setData(json);
-      setLoading(false);
-    }
+    setLoading(true);
 
-    run();
+    const scans = getScanHistory();
+    const generated = generateAlertsFromScans(scans);
+
+    setAlerts(Array.isArray(generated) ? generated : []);
+    setLoading(false);
   }, []);
 
-  return { data, loading };
+  const filtered =
+    severity === "ALL" ? alerts : alerts.filter((a) => a.severity === severity);
+
+  return {
+    alerts: filtered,
+    total: filtered.length,
+    loading,
+    severity,
+    setSeverity,
+  };
 }

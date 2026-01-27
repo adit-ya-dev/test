@@ -1,10 +1,22 @@
-import type { ScanSeverity } from "./scan";
+export type AlertSeverity = "LOW" | "WARNING" | "CRITICAL";
 
-export interface AlertItem {
+export type AlertType =
+  | "DEFORESTATION"
+  | "NDVI_DROP"
+  | "URBAN_EXPANSION"
+  | "ANOMALY";
+
+export interface Alert {
   id: string;
-  type: string;
-  severity: ScanSeverity;
-  message: string;
+  scanId: string;
   createdAt: string;
-  scanId?: string;
+
+  severity: AlertSeverity;
+  type: AlertType;
+
+  title: string;
+  description: string;
+
+  regionName: string;
+  recommendation: string[];
 }
