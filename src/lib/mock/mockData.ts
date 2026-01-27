@@ -1,5 +1,5 @@
 import type { Scan } from "@/types/scan";
-import type { AlertItem } from "@/types/alert";
+import type { Alert } from "@/types/alert"; // Changed from AlertItem
 import type { DashboardStats } from "@/types/analysis";
 
 export const mockDashboardStats: DashboardStats = {
@@ -35,21 +35,30 @@ export const mockRecentScans: Scan[] = [
   },
 ];
 
-export const mockAlerts: AlertItem[] = [
+export const mockAlerts: Alert[] = [
   {
     id: "ALERT-01",
-    type: "Illegal Encroachment",
-    severity: "CRITICAL",
-    message: "Forest → Urban conversion detected above threshold.",
-    createdAt: new Date().toISOString(),
     scanId: "SCAN-1001",
+    createdAt: new Date().toISOString(),
+    severity: "CRITICAL",
+    type: "DEFORESTATION",
+    title: "Illegal Encroachment",
+    description: "Forest → Urban conversion detected above threshold.",
+    regionName: "New Delhi",
+    recommendation: [
+      "Immediate field verification",
+      "Stop construction activity",
+    ],
   },
   {
     id: "ALERT-02",
-    type: "NDVI Drop",
-    severity: "WARNING",
-    message: "NDVI dropped below 0.30 indicating vegetation stress.",
-    createdAt: new Date().toISOString(),
     scanId: "SCAN-1002",
+    createdAt: new Date().toISOString(),
+    severity: "WARNING",
+    type: "NDVI_DROP",
+    title: "NDVI Drop",
+    description: "NDVI dropped below 0.30 indicating vegetation stress.",
+    regionName: "Agra",
+    recommendation: ["Monitor water levels", "Assess soil quality"],
   },
 ];

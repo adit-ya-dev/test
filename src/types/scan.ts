@@ -1,36 +1,11 @@
-// src/types/scan.ts  (or wherever you keep your shared types)
-
 export type ScanSeverity = "LOW" | "MODERATE" | "WARNING" | "CRITICAL";
-// Note: I kept all four levels from the second definition (more granular)
-
 export type ScanStatus = "PROCESSING" | "COMPLETED" | "FAILED";
-
 export type ScanHealthStatus =
   | "CRITICAL"
   | "POOR"
   | "MODERATE"
   | "GOOD"
   | "EXCELLENT";
-export interface ScanResult {
-  scanId: string;
-  createdAt: string;
-  regionName: string;
-  bbox: BoundingBox;
-  dateRange: DateRange;
-  severity: ScanSeverity;
-  status: ScanStatus;
-  transitions: {
-    forestToUrbanPercent: number;
-    waterToLandPercent: number;
-    urbanExpansionPercent: number; // <--- Add this line
-  };
-  ndvi: NDVIStats;
-  images: ScanImages;
-  message?: string;
-  forestLossPercent?: number;
-  urbanGainPercent?: number;
-  meanNdvi?: number;
-}
 
 export interface ScanImages {
   beforeImageUrl: string;
@@ -54,36 +29,39 @@ export interface BoundingBox {
 }
 
 export interface DateRange {
-  startDate: string; // ISO string e.g. "2025-03-15"
+  startDate: string;
   endDate: string;
 }
 
 // ────────────────────────────────────────────────
-// Main detailed scan result (usually shown after clicking a scan)
+// Consolidated ScanResult (ONLY ONE DEFINITION)
+// ────────────────────────────────────────────────
 export interface ScanResult {
   scanId: string;
-  createdAt: string; // ISO timestamp
+  createdAt: string;
   regionName: string;
   bbox: BoundingBox;
   dateRange: DateRange;
   severity: ScanSeverity;
-  status: ScanStatus; // added — very useful in detailed view
+  status: ScanStatus;
   transitions: {
     forestToUrbanPercent: number;
     waterToLandPercent: number;
+    urbanExpansionPercent: number; // Included correctly here
   };
   ndvi: NDVIStats;
   images: ScanImages;
-  message?: string; // error/info message
-  forestLossPercent?: number; // added for consistency with list view
-  urbanGainPercent?: number; // added for consistency
-  meanNdvi?: number; // redundant with ndvi.mean, but optional for convenience
+  message?: string;
+  forestLossPercent?: number;
+  urbanGainPercent?: number;
+  meanNdvi?: number;
 }
 
 // ────────────────────────────────────────────────
 // Compact version used in list/dashboard view
+// ────────────────────────────────────────────────
 export interface Scan {
-  id: string; // = scanId
+  id: string;
   regionName: string;
   createdAt: string;
   status: ScanStatus;

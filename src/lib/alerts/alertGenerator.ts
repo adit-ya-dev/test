@@ -49,7 +49,6 @@ export function generateAlertsFromScans(scans: unknown): Alert[] {
     }
 
     // 🟠 WARNING: Urban Expansion
-    // Check if the property exists and is a number before comparing
     const expansion = scan.transitions?.urbanExpansionPercent;
 
     if (expansion !== undefined && expansion >= 15) {
@@ -68,6 +67,7 @@ export function generateAlertsFromScans(scans: unknown): Alert[] {
         ],
       });
     }
+  } // <--- This was the missing brace closing the 'for' loop
 
   return alerts.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
