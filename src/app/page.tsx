@@ -215,17 +215,19 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm transition-colors"
+              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
             >
               <div className="relative w-full h-64 overflow-hidden">
-                <Image
-                  src="/satellite.png"
-                  alt="Satellite Analysis"
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                />
-                {/* Removed the dark gradient overlay that was hiding the image */}
+                <div className="w-full h-full">
+                  <Image
+                    src="/satellite.png"
+                    alt="Satellite Analysis"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  />
+                </div>
+                {/* Dark gradient overlay removed for clarity */}
               </div>
 
               <div className="p-8">
@@ -235,10 +237,14 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-bold text-white mb-3">
                   Satellite Analysis
                 </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-300 leading-relaxed mb-4">
                   Multi-spectral imaging from Sentinel-2 satellites with 10m
                   spatial resolution and 5-day temporal frequency.
                 </p>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <span>Learn more</span>
+                  <ChevronRight className="h-4 w-4" />
+                </div>
               </div>
             </motion.div>
 
@@ -248,16 +254,18 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm transition-colors"
+              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
             >
               <div className="relative w-full h-64 overflow-hidden">
-                <Image
-                  src="/ndvi_monitoring.png"
-                  alt="NDVI Monitoring"
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                />
+                <div className="w-full h-full">
+                  <Image
+                    src="/ndvi_monitoring.png"
+                    alt="NDVI Monitoring"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  />
+                </div>
               </div>
 
               <div className="p-8">
@@ -267,10 +275,14 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-bold text-white mb-3">
                   NDVI Monitoring
                 </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-300 leading-relaxed mb-4">
                   Normalized Difference Vegetation Index tracking with
                   time-series analysis and anomaly detection.
                 </p>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <span>View metrics</span>
+                  <ChevronRight className="h-4 w-4" />
+                </div>
               </div>
             </motion.div>
 
@@ -280,16 +292,18 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm transition-colors"
+              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
             >
               <div className="relative w-full h-64 overflow-hidden">
-                <Image
-                  src="/change.png"
-                  alt="Change Detection"
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
-                />
+                <div className="w-full h-full">
+                  <Image
+                    src="/change.png"
+                    alt="Change Detection"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  />
+                </div>
               </div>
 
               <div className="p-8">
@@ -299,10 +313,14 @@ export default function LandingPage() {
                 <h3 className="text-2xl font-bold text-white mb-3">
                   Change Detection
                 </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-slate-300 leading-relaxed mb-4">
                   Semantic segmentation and pixel-level comparison for
                   land-cover classification and change mapping.
                 </p>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <span>Explore detection</span>
+                  <ChevronRight className="h-4 w-4" />
+                </div>
               </div>
             </motion.div>
           </div>
@@ -418,13 +436,6 @@ export default function LandingPage() {
             <p className="text-sm text-slate-500 mb-4">
               All methodologies are open-source and peer-reviewed
             </p>
-            <Link
-              href="#"
-              className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              View full research documentation
-              <ChevronRight className="h-4 w-4" />
-            </Link>
           </motion.div>
         </div>
       </section>
