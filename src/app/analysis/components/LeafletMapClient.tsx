@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Trash2, Square, Loader2 } from "lucide-react";
+import { Trash2, Square, Loader2, ZoomIn, ZoomOut } from "lucide-react";
 
 export default function LeafletMapClient({
   onBboxChange,
@@ -14,56 +14,39 @@ export default function LeafletMapClient({
   const [drawingMode, setDrawingMode] = useState(false);
   const [hasSelection, setHasSelection] = useState(false);
   const onBboxChangeRef = useRef(onBboxChange);
+  const startPointRef = useRef<any>(null);
 
   useEffect(() => {
     onBboxChangeRef.current = onBboxChange;
   }, [onBboxChange]);
 
+  // Initialize map only once
   useEffect(() => {
-    if (typeof window === "undefined" || !mapRef.current) return;
+    if (typeof window === "undefined" || !mapRef.current || mapInstance.current)
+      return;
+
     const initMap = () => {
       // @ts-ignore
       const L = window.L;
-      if (!L || mapInstance.current) return;
-      const map = L.map(mapRef.current, { zoomControl: false }).setView(
-        [28.6139, 77.209],
-        12,
-      );
+      if (!L) return;
+
+      const map = L.map(mapRef.current, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([28.6139, 77.209], 12);
+
       mapInstance.current = map;
+
       L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          maxZoom: 19,
+        },
       ).addTo(map);
 
-      let startPoint: any = null;
-      map.on("mousedown", (e: any) => {
-        if (!drawingMode) return;
-        map.dragging.disable();
-        startPoint = e.latlng;
-        if (rectangleRef.current) map.removeLayer(rectangleRef.current);
-        rectangleRef.current = L.rectangle([startPoint, startPoint], {
-          color: "#3b82f6",
-          weight: 2,
-          fillOpacity: 0.2,
-        }).addTo(map);
-      });
-      map.on("mousemove", (e: any) => {
-        if (!startPoint || !rectangleRef.current) return;
-        rectangleRef.current.setBounds(L.latLngBounds(startPoint, e.latlng));
-      });
-      map.on("mouseup", () => {
-        if (!startPoint || !rectangleRef.current) return;
-        const bounds = rectangleRef.current.getBounds();
-        onBboxChangeRef.current({
-          north: bounds.getNorth(),
-          south: bounds.getSouth(),
-          east: bounds.getEast(),
-          west: bounds.getWest(),
-        });
-        startPoint = null;
-        map.dragging.enable();
-        setDrawingMode(false);
-        setHasSelection(true);
-      });
+      // Add custom zoom controls
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+
       setMapLoaded(true);
     };
 
@@ -74,13 +57,16 @@ export default function LeafletMapClient({
       link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
       document.head.appendChild(link);
     }
+
     if (!(window as any).L) {
       const script = document.createElement("script");
       script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
       script.async = true;
       script.onload = initMap;
       document.head.appendChild(script);
-    } else initMap();
+    } else {
+      initMap();
+    }
 
     return () => {
       if (mapInstance.current) {
@@ -88,45 +74,176 @@ export default function LeafletMapClient({
         mapInstance.current = null;
       }
     };
+  }, []); // Empty dependency array - initialize only once
+
+  // Handle drawing mode separately
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map) return;
+
+    const L = (window as any).L;
+    if (!L) return;
+
+    const handleMouseDown = (e: any) => {
+      if (!drawingMode) return;
+
+      // Prevent map panning while drawing
+      map.dragging.disable();
+      map.doubleClickZoom.disable();
+
+      startPointRef.current = e.latlng;
+
+      // Remove existing rectangle if any
+      if (rectangleRef.current) {
+        map.removeLayer(rectangleRef.current);
+      }
+
+      // Create new rectangle
+      rectangleRef.current = L.rectangle([e.latlng, e.latlng], {
+        color: "#3b82f6",
+        weight: 2,
+        fillOpacity: 0.2,
+        fillColor: "#3b82f6",
+      }).addTo(map);
+    };
+
+    const handleMouseMove = (e: any) => {
+      if (!startPointRef.current || !rectangleRef.current || !drawingMode)
+        return;
+      rectangleRef.current.setBounds(
+        L.latLngBounds(startPointRef.current, e.latlng),
+      );
+    };
+
+    const handleMouseUp = (e: any) => {
+      if (!startPointRef.current || !rectangleRef.current || !drawingMode)
+        return;
+
+      const bounds = rectangleRef.current.getBounds();
+
+      // Only save if the rectangle has some area
+      const north = bounds.getNorth();
+      const south = bounds.getSouth();
+      const east = bounds.getEast();
+      const west = bounds.getWest();
+
+      if (Math.abs(north - south) > 0.0001 && Math.abs(east - west) > 0.0001) {
+        onBboxChangeRef.current({ north, south, east, west });
+        setHasSelection(true);
+      } else {
+        // Remove tiny rectangles
+        if (rectangleRef.current) {
+          map.removeLayer(rectangleRef.current);
+          rectangleRef.current = null;
+        }
+      }
+
+      startPointRef.current = null;
+
+      // Re-enable map controls
+      map.dragging.enable();
+      map.doubleClickZoom.enable();
+
+      setDrawingMode(false);
+    };
+
+    if (drawingMode) {
+      map.on("mousedown", handleMouseDown);
+      map.on("mousemove", handleMouseMove);
+      map.on("mouseup", handleMouseUp);
+      map.getContainer().style.cursor = "crosshair";
+    } else {
+      map.off("mousedown", handleMouseDown);
+      map.off("mousemove", handleMouseMove);
+      map.off("mouseup", handleMouseUp);
+      map.getContainer().style.cursor = "grab";
+
+      // Re-enable map controls when not drawing
+      map.dragging.enable();
+      map.doubleClickZoom.enable();
+    }
+
+    return () => {
+      map.off("mousedown", handleMouseDown);
+      map.off("mousemove", handleMouseMove);
+      map.off("mouseup", handleMouseUp);
+    };
   }, [drawingMode]);
 
-  return (
-    <div className="relative w-full h-full min-h-[500px] bg-muted overflow-hidden rounded-xl border border-border">
-      <div
-        ref={mapRef}
-        className="w-full h-full z-0"
-        style={{ cursor: drawingMode ? "crosshair" : "grab" }}
-      />
+  const handleClearSelection = () => {
+    if (rectangleRef.current && mapInstance.current) {
+      mapInstance.current.removeLayer(rectangleRef.current);
+      rectangleRef.current = null;
+      setHasSelection(false);
+      onBboxChangeRef.current(null);
+    }
+  };
 
-      <div className="absolute top-4 right-4 z-[10] flex flex-col gap-2">
+  const handleZoomIn = () => {
+    if (mapInstance.current) {
+      mapInstance.current.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (mapInstance.current) {
+      mapInstance.current.zoomOut();
+    }
+  };
+
+  return (
+    <div className="relative w-full h-full min-h-[400px] md:min-h-[500px] lg:min-h-[600px] bg-muted overflow-hidden rounded-xl border border-border shadow-lg">
+      <div ref={mapRef} className="w-full h-full z-0" />
+
+      {/* Control Panel */}
+      <div className="absolute top-3 right-3 md:top-4 md:right-4 z-[1000] flex flex-col gap-2">
+        {/* Draw Rectangle Button */}
         <button
           onClick={() => setDrawingMode(!drawingMode)}
-          className={`flex h-10 w-10 items-center justify-center rounded-lg border shadow-lg transition-all ${
+          disabled={!mapLoaded}
+          className={`flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border shadow-lg transition-all ${
             drawingMode
-              ? "bg-primary text-primary-foreground border-primary"
-              : "bg-card text-foreground border-border hover:bg-muted"
-          }`}
+              ? "bg-primary text-primary-foreground border-primary scale-105"
+              : "bg-card text-foreground border-border hover:bg-accent hover:scale-105"
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          title={drawingMode ? "Cancel drawing" : "Draw selection area"}
         >
-          <Square size={18} />
+          <Square size={18} className={drawingMode ? "fill-current" : ""} />
         </button>
+
+        {/* Clear Selection Button */}
         {hasSelection && (
           <button
-            onClick={() => {
-              if (rectangleRef.current) {
-                mapInstance.current.removeLayer(rectangleRef.current);
-                setHasSelection(false);
-              }
-            }}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-rose-500/50 bg-card text-rose-500 shadow-lg hover:bg-rose-500 hover:text-white transition-all"
+            onClick={handleClearSelection}
+            className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-destructive/50 bg-card text-destructive shadow-lg hover:bg-destructive hover:text-destructive-foreground transition-all hover:scale-105 animate-in fade-in zoom-in duration-200"
+            title="Clear selection"
           >
             <Trash2 size={18} />
           </button>
         )}
       </div>
 
+      {/* Drawing Mode Indicator */}
+      {drawingMode && (
+        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-[1000] bg-primary text-primary-foreground px-3 py-2 md:px-4 md:py-2 rounded-lg shadow-lg text-xs md:text-sm font-medium animate-in fade-in slide-in-from-left duration-300">
+          Click and drag to select area
+        </div>
+      )}
+
+      {/* Selection Info */}
+      {hasSelection && !drawingMode && (
+        <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4 z-[1000] bg-card/95 backdrop-blur-sm border border-border text-foreground px-3 py-2 md:px-4 md:py-2 rounded-lg shadow-lg text-xs md:text-sm font-medium animate-in fade-in slide-in-from-left duration-300">
+          ✓ Area selected
+        </div>
+      )}
+
+      {/* Loading Overlay */}
       {!mapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm z-[20]">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm z-[2000] gap-3">
+          <Loader2 className="w-8 h-8 md:w-10 md:h-10 text-primary animate-spin" />
+          <p className="text-sm md:text-base text-muted-foreground font-medium">
+            Loading map...
+          </p>
         </div>
       )}
     </div>

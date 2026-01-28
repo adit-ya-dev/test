@@ -1,6 +1,13 @@
 "use client";
 
 import type { DataLogsFilters } from "@/types/dataLogs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function DataLogsFilters({
   filters,
@@ -21,30 +28,48 @@ export default function DataLogsFilters({
 
       <div className="flex flex-col sm:flex-row gap-3">
         {/* Severity */}
-        <select
+        <Select
           value={filters.severity}
-          onChange={(e) =>
-            onChange({ ...filters, severity: e.target.value as any })
+          onValueChange={(value) =>
+            onChange({ ...filters, severity: value as any })
           }
-          className="rounded-xl border border-border bg-background px-4 py-2 text-sm text-foreground outline-none cursor-pointer hover:bg-muted transition-colors"
         >
-          <option value="ALL">All Severity</option>
-          <option value="LOW">LOW</option>
-          <option value="WARNING">WARNING</option>
-          <option value="CRITICAL">CRITICAL</option>
-        </select>
+          <SelectTrigger className="w-[180px] rounded-xl bg-background">
+            <SelectValue placeholder="All Severity" />
+          </SelectTrigger>
+
+          <SelectContent
+            position="popper"
+            sideOffset={6}
+            className="w-[var(--radix-select-trigger-width)] rounded-xl border border-border bg-popover shadow-lg"
+          >
+            <SelectItem value="ALL">All Severity</SelectItem>
+            <SelectItem value="LOW">LOW</SelectItem>
+            <SelectItem value="WARNING">WARNING</SelectItem>
+            <SelectItem value="CRITICAL">CRITICAL</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* Sort */}
-        <select
+        <Select
           value={filters.sort}
-          onChange={(e) =>
-            onChange({ ...filters, sort: e.target.value as any })
+          onValueChange={(value) =>
+            onChange({ ...filters, sort: value as any })
           }
-          className="rounded-xl border border-border bg-background px-4 py-2 text-sm text-foreground outline-none cursor-pointer hover:bg-muted transition-colors"
         >
-          <option value="NEWEST">Newest First</option>
-          <option value="OLDEST">Oldest First</option>
-        </select>
+          <SelectTrigger className="w-[180px] rounded-xl bg-background">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+
+          <SelectContent
+            position="popper"
+            sideOffset={6}
+            className="w-[var(--radix-select-trigger-width)] rounded-xl border border-border bg-popover shadow-lg"
+          >
+            <SelectItem value="NEWEST">Newest First</SelectItem>
+            <SelectItem value="OLDEST">Oldest First</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
