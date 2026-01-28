@@ -79,7 +79,7 @@ export default function LandingPage() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/30 backdrop-blur-xl shadow-lg"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/80 bg-black/30 backdrop-blur-xl shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-700 bg-slate-900/80 backdrop-blur-sm text-xs text-slate-300"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-800/80 bg-slate-900/80 backdrop-blur-sm text-xs text-slate-300"
           >
             <div className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             Powered by ESA Sentinel-2 • Research-backed methodology
@@ -149,7 +149,9 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-none"
           >
-            <span className="text-white">Geospatial intelligence</span>
+            <span className="text-white">
+              Geospatial intelligence
+            </span>
             <br />
             <span className="bg-gradient-to-br from-slate-300 via-slate-400 to-slate-500 bg-clip-text text-transparent">
               at scale
@@ -188,10 +190,7 @@ export default function LandingPage() {
       </section>
 
       {/* Core Triad with Images */}
-      <section
-        id="features"
-        className="relative py-24 px-6 border-t border-slate-800 bg-slate-950"
-      >
+      <section id="features" className="relative py-24 px-6 border-t border-slate-800">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -200,7 +199,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
               The Core Triad
             </h2>
             <p className="text-lg text-slate-400">
@@ -215,10 +214,16 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
+              whileHover={{ scale: 1.05, y: -10 }}
+              className="group relative rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/50 backdrop-blur-sm hover:border-slate-700/80 transition-all cursor-pointer hover:shadow-2xl hover:shadow-slate-700/50"
             >
+              {/* Image - Auto-fits any dimension */}
               <div className="relative w-full h-64 overflow-hidden">
-                <div className="w-full h-full">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full h-full"
+                >
                   <Image
                     src="/satellite.png"
                     alt="Satellite Analysis"
@@ -226,25 +231,32 @@ export default function LandingPage() {
                     className="object-cover object-center"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   />
-                </div>
-                {/* Dark gradient overlay removed for clarity */}
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
               </div>
 
+              {/* Content */}
               <div className="p-8">
-                <div className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-center mb-4">
+                <motion.div
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
+                  className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-700/80 flex items-center justify-center mb-4"
+                >
                   <Globe className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  Satellite Analysis
-                </h3>
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-3">Satellite Analysis</h3>
                 <p className="text-slate-300 leading-relaxed mb-4">
                   Multi-spectral imaging from Sentinel-2 satellites with 10m
                   spatial resolution and 5-day temporal frequency.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <motion.div
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-2 text-sm text-slate-400"
+                >
                   <span>Learn more</span>
                   <ChevronRight className="h-4 w-4" />
-                </div>
+                </motion.div>
               </div>
             </motion.div>
 
@@ -254,10 +266,16 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
+              whileHover={{ scale: 1.05, y: -10 }}
+              className="group relative rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/50 backdrop-blur-sm hover:border-slate-700/80 transition-all cursor-pointer hover:shadow-2xl hover:shadow-slate-700/50"
             >
+              {/* Image - Auto-fits any dimension */}
               <div className="relative w-full h-64 overflow-hidden">
-                <div className="w-full h-full">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full h-full"
+                >
                   <Image
                     src="/ndvi_monitoring.png"
                     alt="NDVI Monitoring"
@@ -265,24 +283,32 @@ export default function LandingPage() {
                     className="object-cover object-center"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   />
-                </div>
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
               </div>
 
+              {/* Content */}
               <div className="p-8">
-                <div className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-center mb-4">
+                <motion.div
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
+                  className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-700/80 flex items-center justify-center mb-4"
+                >
                   <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  NDVI Monitoring
-                </h3>
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-3">NDVI Monitoring</h3>
                 <p className="text-slate-300 leading-relaxed mb-4">
                   Normalized Difference Vegetation Index tracking with
                   time-series analysis and anomaly detection.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <motion.div
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-2 text-sm text-slate-400"
+                >
                   <span>View metrics</span>
                   <ChevronRight className="h-4 w-4" />
-                </div>
+                </motion.div>
               </div>
             </motion.div>
 
@@ -292,10 +318,16 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="group relative rounded-xl border border-slate-700 overflow-hidden bg-slate-900/50 backdrop-blur-sm"
+              whileHover={{ scale: 1.05, y: -10 }}
+              className="group relative rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/50 backdrop-blur-sm hover:border-slate-700/80 transition-all cursor-pointer hover:shadow-2xl hover:shadow-slate-700/50"
             >
+              {/* Image - Auto-fits any dimension */}
               <div className="relative w-full h-64 overflow-hidden">
-                <div className="w-full h-full">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full h-full"
+                >
                   <Image
                     src="/change.png"
                     alt="Change Detection"
@@ -303,24 +335,32 @@ export default function LandingPage() {
                     className="object-cover object-center"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   />
-                </div>
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
               </div>
 
+              {/* Content */}
               <div className="p-8">
-                <div className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-600 flex items-center justify-center mb-4">
+                <motion.div
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
+                  className="h-12 w-12 rounded-lg bg-slate-700/50 border border-slate-700/80 flex items-center justify-center mb-4"
+                >
                   <AlertTriangle className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  Change Detection
-                </h3>
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-3">Change Detection</h3>
                 <p className="text-slate-300 leading-relaxed mb-4">
                   Semantic segmentation and pixel-level comparison for
                   land-cover classification and change mapping.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
+                <motion.div
+                  initial={{ x: 0 }}
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-2 text-sm text-slate-400"
+                >
                   <span>Explore detection</span>
                   <ChevronRight className="h-4 w-4" />
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -328,10 +368,7 @@ export default function LandingPage() {
       </section>
 
       {/* Research Validation Section */}
-      <section
-        id="research"
-        className="relative py-24 px-6 border-t border-slate-800 bg-slate-950/50"
-      >
+      <section id="research" className="relative py-24 px-6 border-t border-slate-800 bg-slate-950/50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -340,7 +377,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-700 bg-slate-900/50 backdrop-blur-sm text-xs text-slate-300 mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-800/80 bg-slate-900/50 backdrop-blur-sm text-xs text-slate-300 mb-6">
               <Award className="h-3.5 w-3.5" />
               Peer-Reviewed Research
             </div>
@@ -369,9 +406,7 @@ export default function LandingPage() {
             </div>
             <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
               <Users className="h-8 w-8 text-white mx-auto mb-3" />
-              <div className="text-2xl font-bold mb-1 text-white">
-                NASA/USGS
-              </div>
+              <div className="text-2xl font-bold mb-1 text-white">NASA/USGS</div>
               <div className="text-sm text-slate-400">Validated Methods</div>
             </div>
             <div className="p-6 rounded-xl border border-slate-800 bg-slate-900/50 text-center">
@@ -393,10 +428,10 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group flex flex-col md:flex-row items-start gap-4 p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-900/80 hover:border-slate-700 transition-all"
+                className="group flex flex-col md:flex-row items-start gap-4 p-6 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-900/80 hover:border-slate-800/80 transition-all"
               >
                 <div className="flex-shrink-0">
-                  <div className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-medium text-white">
+                  <div className="px-3 py-1 rounded-full bg-slate-800 border border-slate-800/80 text-xs font-medium text-white">
                     {paper.badge}
                   </div>
                 </div>
@@ -436,6 +471,13 @@ export default function LandingPage() {
             <p className="text-sm text-slate-500 mb-4">
               All methodologies are open-source and peer-reviewed
             </p>
+            <Link
+              href="#"
+              className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              View full research documentation
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -495,9 +537,9 @@ export default function LandingPage() {
                     </h3>
                     <p className="text-slate-400 leading-relaxed mb-6">
                       Automated deforestation alerts for FSC certification,
-                      carbon offset verification, and EU Deforestation
-                      Regulation (EUDR) compliance. Court-admissible
-                      documentation with ISO 19115 metadata.
+                      carbon offset verification, and EU Deforestation Regulation
+                      (EUDR) compliance. Court-admissible documentation with ISO
+                      19115 metadata.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
@@ -530,8 +572,7 @@ export default function LandingPage() {
                     <p className="text-slate-400 leading-relaxed mb-6">
                       Construction monitoring, impervious surface mapping, and
                       infrastructure change detection for municipal planning and
-                      zoning compliance. Heat island analysis and growth
-                      metrics.
+                      zoning compliance. Heat island analysis and growth metrics.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
@@ -563,9 +604,8 @@ export default function LandingPage() {
                     </h3>
                     <p className="text-slate-400 leading-relaxed mb-6">
                       Court-admissible satellite evidence with complete chain of
-                      custody. Property boundary verification, environmental
-                      impact assessment, and expert witness reporting for
-                      litigation.
+                      custody. Property boundary verification, environmental impact
+                      assessment, and expert witness reporting for litigation.
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
@@ -613,7 +653,7 @@ export default function LandingPage() {
               </Link>
               <Link
                 href="#research"
-                className="px-8 py-4 font-medium border border-slate-700 hover:border-slate-600 rounded-lg transition-all"
+                className="px-8 py-4 font-medium border border-slate-800/80 hover:border-slate-700/80 rounded-lg transition-all"
               >
                 View Research
               </Link>
@@ -683,10 +723,7 @@ export default function LandingPage() {
               <h4 className="font-medium mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     Documentation
                   </a>
                 </li>
@@ -699,18 +736,12 @@ export default function LandingPage() {
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     API Reference
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     Case Studies
                   </a>
                 </li>
@@ -721,34 +752,22 @@ export default function LandingPage() {
               <h4 className="font-medium mb-4">Company</h4>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     About
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     Terms of Service
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="hover:text-slate-100 transition-colors"
-                  >
+                  <a href="#" className="hover:text-slate-100 transition-colors">
                     Contact
                   </a>
                 </li>
@@ -770,6 +789,24 @@ export default function LandingPage() {
       <style jsx>{`
         .grain-texture {
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E");
+        }
+
+        /* Remove all white outlines and improve rendering */
+        * {
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        button:focus,
+        a:focus {
+          outline: none;
+          box-shadow: none;
+        }
+
+        /* Prevent white border artifacts */
+        img {
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
         }
       `}</style>
     </div>
