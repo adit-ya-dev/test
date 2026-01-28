@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Trash2, Square, Loader2, ZoomIn, ZoomOut } from "lucide-react";
+import { Trash2, Square, Loader2 } from "lucide-react";
 
 export default function LeafletMapClient({
   onBboxChange,
@@ -15,6 +15,7 @@ export default function LeafletMapClient({
   const [hasSelection, setHasSelection] = useState(false);
   const onBboxChangeRef = useRef(onBboxChange);
   const startPointRef = useRef<any>(null);
+  const isInitializing = useRef(false);
 
   useEffect(() => {
     onBboxChangeRef.current = onBboxChange;
@@ -22,32 +23,59 @@ export default function LeafletMapClient({
 
   // Initialize map only once
   useEffect(() => {
-    if (typeof window === "undefined" || !mapRef.current || mapInstance.current)
+    if (
+      typeof window === "undefined" ||
+      !mapRef.current ||
+      mapInstance.current ||
+      isInitializing.current
+    )
       return;
 
     const initMap = () => {
       // @ts-ignore
       const L = window.L;
-      if (!L) return;
+      if (!L || !mapRef.current) return;
 
-      const map = L.map(mapRef.current, {
-        zoomControl: false,
-        attributionControl: false,
-      }).setView([28.6139, 77.209], 12);
+      isInitializing.current = true;
 
-      mapInstance.current = map;
+      try {
+        // Check if container already has a map instance
+        const container = mapRef.current;
 
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          maxZoom: 19,
-        },
-      ).addTo(map);
+        // Remove any existing Leaflet instance from this container
+        if ((container as any)._leaflet_id) {
+          // Try to find and remove the old map
+          try {
+            const oldMapId = (container as any)._leaflet_id;
+            // Clear the leaflet id
+            delete (container as any)._leaflet_id;
+          } catch (e) {
+            console.warn("Could not clean up old map:", e);
+          }
+        }
 
-      // Add custom zoom controls
-      L.control.zoom({ position: "bottomright" }).addTo(map);
+        const map = L.map(container, {
+          zoomControl: false,
+          attributionControl: false,
+        }).setView([28.6139, 77.209], 12);
 
-      setMapLoaded(true);
+        mapInstance.current = map;
+
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            maxZoom: 19,
+          },
+        ).addTo(map);
+
+        // Add custom zoom controls
+        L.control.zoom({ position: "bottomright" }).addTo(map);
+
+        setMapLoaded(true);
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        isInitializing.current = false;
+      }
     };
 
     if (!document.getElementById("leaflet-css")) {
@@ -70,9 +98,14 @@ export default function LeafletMapClient({
 
     return () => {
       if (mapInstance.current) {
-        mapInstance.current.remove();
+        try {
+          mapInstance.current.remove();
+        } catch (e) {
+          console.warn("Error removing map:", e);
+        }
         mapInstance.current = null;
       }
+      isInitializing.current = false;
     };
   }, []); // Empty dependency array - initialize only once
 
@@ -176,18 +209,6 @@ export default function LeafletMapClient({
       rectangleRef.current = null;
       setHasSelection(false);
       onBboxChangeRef.current(null);
-    }
-  };
-
-  const handleZoomIn = () => {
-    if (mapInstance.current) {
-      mapInstance.current.zoomIn();
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (mapInstance.current) {
-      mapInstance.current.zoomOut();
     }
   };
 

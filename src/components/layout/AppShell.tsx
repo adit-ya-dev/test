@@ -48,6 +48,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     if (type === "reset") setFontSize(100);
   };
 
+  // Don't show AppShell on landing page
+  if (pathname === "/") {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen font-sans bg-background text-foreground">
       {/* HEADER */}
@@ -99,17 +104,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed left-0 top-[80px] bottom-0 z-20 flex flex-col border-r bg-card transition-all duration-300 ease-in-out ${
-          isExpanded ? "w-[260px]" : "w-[72px]"
+        className={`fixed left-0 top-[80px] bottom-0 z-20 flex flex-col border-r bg-card/50 backdrop-blur-sm transition-all duration-300 ease-in-out ${
+          isExpanded ? "w-[260px] shadow-lg" : "w-[72px]"
         }`}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
       >
-        <nav className="flex-1 p-4 flex flex-col gap-1 overflow-y-auto">
+        <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
 
-            // Make Dashboard active also on root path "/"
             const isActive =
               pathname === item.href ||
               pathname.startsWith(item.href + "/") ||
@@ -120,20 +124,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={[
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                  "focus:outline-none focus:ring-2 focus:ring-primary/25",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all duration-200",
+                  "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "bg-primary/90 dark:bg-primary text-primary-foreground shadow-md dark:shadow-primary/20"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 ].join(" ")}
               >
                 {/* Active indicator bar */}
                 <span
                   className={[
-                    "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-[3px] rounded-r-full transition-all",
+                    "absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full transition-all",
                     isActive
-                      ? "bg-primary-foreground opacity-100"
-                      : "bg-primary/40 opacity-0 group-hover:opacity-100",
+                      ? "bg-primary-foreground dark:bg-white opacity-100 scale-100"
+                      : "bg-primary/40 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100",
                   ].join(" ")}
                 />
 
@@ -141,9 +145,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <Icon
                   size={20}
                   className={[
-                    "flex-shrink-0 transition-transform duration-200",
+                    "flex-shrink-0 transition-all duration-200",
                     isActive
-                      ? "text-primary-foreground"
+                      ? "text-primary-foreground dark:text-white"
                       : "text-muted-foreground group-hover:text-accent-foreground group-hover:scale-110",
                   ].join(" ")}
                 />
@@ -151,31 +155,37 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 {/* Text - visible when expanded */}
                 <span
                   className={[
-                    "transition-all duration-300 whitespace-nowrap",
+                    "transition-all duration-300 whitespace-nowrap font-medium",
                     isExpanded
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-2 w-0 overflow-hidden",
+                    isActive ? "text-primary-foreground dark:text-white" : "",
                   ].join(" ")}
                 >
                   {item.name}
                 </span>
+
+                {/* Active dot indicator - visible when collapsed */}
+                {isActive && !isExpanded && (
+                  <span className="absolute right-2 w-1.5 h-1.5 rounded-full bg-primary-foreground dark:bg-white animate-pulse" />
+                )}
               </Link>
             );
           })}
         </nav>
 
         {/* USER FOOTER */}
-        <div className="mt-auto p-4 border-t bg-muted/10">
+        <div className="mt-auto p-4 border-t bg-muted/20 dark:bg-muted/10">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="outline"
+                variant="ghost"
                 className={[
-                  "w-full justify-start gap-2 h-12 rounded-xl transition-all duration-300",
-                  !isExpanded && "px-2",
+                  "w-full justify-start gap-3 h-auto py-2 rounded-xl transition-all duration-300 hover:bg-accent",
+                  !isExpanded && "px-2 justify-center",
                 ].join(" ")}
               >
-                <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm flex-shrink-0">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden ring-2 ring-primary/20 dark:ring-primary/30 shadow-sm flex-shrink-0">
                   <Image
                     src="/avatar.png"
                     alt="User Avatar"
@@ -191,12 +201,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       : "opacity-0 -translate-x-2 w-0 overflow-hidden",
                   ].join(" ")}
                 >
-                  <p className="text-sm font-semibold">Aditya Pamar</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    Aditya Pamar
+                  </p>
                   <p className="text-xs text-muted-foreground">Premium</p>
                 </div>
                 <ChevronDown
                   className={[
-                    "w-4 h-4 text-muted-foreground transition-all duration-300",
+                    "w-4 h-4 text-muted-foreground transition-all duration-300 flex-shrink-0",
                     isExpanded
                       ? "opacity-100 translate-x-0"
                       : "opacity-0 -translate-x-2 w-0 overflow-hidden",
@@ -205,20 +217,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <User className="w-4 h-4 mr-2" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Shield className="w-4 h-4 mr-2" />
                 Security
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive cursor-pointer focus:text-destructive">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </DropdownMenuItem>
@@ -229,7 +241,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* MAIN CONTENT */}
       <main
-        className={`mt-[80px] min-h-[calc(100vh-80px)] p-6 bg-background transition-all duration-300 ${
+        className={`mt-[80px] min-h-[calc(100vh-80px)] p-6 bg-background transition-all duration-300 ease-in-out ${
           isExpanded ? "ml-[260px]" : "ml-[72px]"
         }`}
       >
