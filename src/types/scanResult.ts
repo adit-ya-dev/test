@@ -5,7 +5,7 @@ export interface ScanFinding {
   type: "DEFORESTATION" | "URBAN_EXPANSION" | "WATER_LOSS" | "ILLEGAL_MINING";
   severity: ScanSeverity;
   areaHectares: number;
-  confidence: number; // 0 to 1
+  confidence: number; 
   description: string;
 }
 
