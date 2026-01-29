@@ -37,6 +37,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [fontSize, setFontSize] = useState(100);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}%`;
@@ -108,7 +109,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           isExpanded ? "w-[260px] shadow-lg" : "w-[72px]"
         }`}
         onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
+        onMouseLeave={() => {
+          if (!isDropdownOpen) {
+            setIsExpanded(false);
+          }
+        }}
       >
         <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
           {navItems.map((item) => {
@@ -173,7 +178,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* USER FOOTER */}
         <div className="mt-auto p-4 border-t bg-muted/20 dark:bg-muted/10">
-          <DropdownMenu>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
