@@ -589,8 +589,7 @@ export default function LandingPage() {
               Start monitoring today
             </h2>
             <p className="text-lg text-slate-400 mb-8 max-w-2xl mx-auto">
-              No credit card required. Full API access and research
-              documentation included.
+              Full API access and research documentation included.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
