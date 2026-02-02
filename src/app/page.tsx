@@ -110,18 +110,20 @@ export default function LandingPage() {
         </div>
       </motion.nav>
 
-      {/* Hero Section with World Map */}
+      {/* Hero Section with Video Background */}
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-12 overflow-hidden">
-        {/* World Map Background - More Visible */}
+        {/* Video Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black z-10" />
-          <Image
-            src="/world_map.png"
-            alt="World map"
-            fill
-            className="object-cover opacity-50"
-            priority
-          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/60 to-black z-20" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+          >
+            <source src="/globe.mp4" type="video/mp4" />
+          </video>
         </div>
 
         {/* Grain Overlay */}
