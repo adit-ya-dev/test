@@ -1,34 +1,36 @@
 import { NextResponse } from "next/server";
 
 /**
- * API Route: /api/analyze
+ * API Route: /api/results/[job_id]
  * 
- * PROXY MODE: Forwards requests to AWS backend to avoid CORS issues
- * The browser calls this same-origin endpoint, and the Next.js server
- * forwards the request to AWS (server-to-server has no CORS restrictions)
+ * PROXY MODE: Forwards polling requests to AWS backend to avoid CORS issues
+ * 
+ * Usage: GET /api/results/123e4567-e89b-12d3-a456-426614174000
+ * Forwards to: GET https://48ih4pysre.execute-api.us-west-2.amazonaws.com/dev/results/123e4567-e89b-12d3-a456-426614174000
  */
 
 const AWS_API_URL = process.env.NEXT_PUBLIC_API_URL || 
                     process.env.NEXT_PUBLIC_AWS_API_BASE ||
                     "https://48ih4pysre.execute-api.us-west-2.amazonaws.com/dev";
 
-export async function POST(req: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ job_id: string }> }
+) {
   try {
-    console.log("[API Proxy] /api/analyze - Forwarding to AWS backend...");
-
-    // Get the request body from the frontend
-    const body = await req.json();
-    console.log("[API Proxy] Request body:", body);
+    const { job_id } = await params;
+    
+    console.log(`[API Proxy] /api/results/${job_id} - Forwarding to AWS...`);
 
     // Forward to AWS backend (server-to-server, no CORS issues!)
-    console.log(`[API Proxy] POST ${AWS_API_URL}/analyze`);
-    
-    const awsResponse = await fetch(`${AWS_API_URL}/analyze`, {
-      method: "POST",
+    const awsUrl = `${AWS_API_URL}/results/${job_id}`;
+    console.log(`[API Proxy] GET ${awsUrl}`);
+
+    const awsResponse = await fetch(awsUrl, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
     });
 
     if (!awsResponse.ok) {
@@ -42,7 +44,7 @@ export async function POST(req: Request) {
 
     // Get the response from AWS
     const awsData = await awsResponse.json();
-    console.log("[API Proxy] AWS Response:", awsData);
+    console.log(`[API Proxy] AWS Response for ${job_id}:`, awsData.status);
 
     // Return to frontend (same-origin, no CORS!)
     return NextResponse.json(awsData);
@@ -58,7 +60,6 @@ export async function POST(req: Request) {
 
 /**
  * Handle OPTIONS request for CORS preflight
- * (Though this shouldn't be needed since it's same-origin)
  */
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200 });

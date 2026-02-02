@@ -54,10 +54,19 @@ export default function LeafletMapClient({
           }
         }
 
+        // Rondônia, Brazil bounds and center
+        const rondoniaBounds = L.latLngBounds(
+          [-13.5, -66.5], // Southwest corner
+          [-8.0, -59.5]   // Northeast corner
+        );
+        
         const map = L.map(container, {
           zoomControl: false,
           attributionControl: false,
-        }).setView([28.6139, 77.209], 12);
+          maxBounds: rondoniaBounds,        // Restrict panning to Rondônia
+          minZoom: 6,                       // Prevent zooming out too far
+          maxZoom: 19,
+        }).setView([-10.5, -63.0], 7);      // Center on Rondônia with zoom level 7
 
         mapInstance.current = map;
 

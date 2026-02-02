@@ -6,35 +6,67 @@ import {
   Search,
   FileText,
   Loader2,
+  Upload,
+  Cpu,
 } from "lucide-react";
+import type { AnalysisProgress } from "@/hooks/useAnalyzeRegion";
+
+interface ScanProgressLogProps {
+  loading: boolean;
+  result: any;
+  progress?: AnalysisProgress;
+}
 
 export default function ScanProgressLog({
   loading,
   result,
-}: {
-  loading: boolean;
-  result: any;
-}) {
+  progress,
+}: ScanProgressLogProps) {
   const steps = [
-    { id: 1, label: "AOI VALIDATION", icon: Target },
-    { id: 2, label: "SATELLITE ACQUISITION", icon: Satellite },
-    { id: 3, label: "NDVI RADIOMETRY", icon: Leaf },
-    { id: 4, label: "CHANGE DETECTION", icon: Search },
-    { id: 5, label: "REPORT ENCRYPTION", icon: FileText },
+    { id: 1, label: "AOI VALIDATION", icon: Target, stage: "initializing" },
+    { id: 2, label: "SATELLITE ACQUISITION", icon: Satellite, stage: "initializing" },
+    { id: 3, label: "FILE UPLOAD", icon: Upload, stage: "uploading" },
+    { id: 4, label: "NDVI RADIOMETRY", icon: Leaf, stage: "processing" },
+    { id: 5, label: "CHANGE DETECTION", icon: Search, stage: "processing" },
+    { id: 6, label: "AI PROCESSING", icon: Cpu, stage: "processing" },
+    { id: 7, label: "REPORT ENCRYPTION", icon: FileText, stage: "completed" },
   ];
+
+  const getStepStatus = (stepStage: string) => {
+    if (!loading && !result) return "pending";
+    if (!loading && result) return "completed";
+    
+    // Loading state - determine based on progress
+    const currentStage = progress?.stage || "initializing";
+    
+    const stageOrder = ["initializing", "uploading", "processing", "completed"];
+    const currentIndex = stageOrder.indexOf(currentStage);
+    const stepIndex = stageOrder.indexOf(stepStage);
+    
+    if (stepIndex < currentIndex) return "completed";
+    if (stepIndex === currentIndex) return "processing";
+    return "pending";
+  };
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-6">
         System Diagnostics
       </p>
+      
+      {/* Progress Message */}
+      {loading && progress?.message && (
+        <div className="mb-4 p-3 bg-primary/5 border border-primary/10 rounded-lg">
+          <p className="text-xs text-primary font-medium flex items-center gap-2">
+            <Loader2 size={12} className="animate-spin" />
+            {progress.message}
+          </p>
+        </div>
+      )}
+      
       <div className="space-y-4">
         {steps.map((step) => {
-          const status = loading
-            ? "processing"
-            : result
-              ? "completed"
-              : "pending";
+          const status = getStepStatus(step.stage);
           return (
             <div key={step.id} className="flex items-center gap-4">
               <div
