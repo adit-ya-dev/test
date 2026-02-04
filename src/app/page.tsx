@@ -114,17 +114,17 @@ export default function LandingPage() {
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-12 overflow-hidden">
         {/* Video Background */}
         <div className="absolute inset-0">
-  <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/30 to-black/70 z-20" />
-  <video
-    autoPlay
-    loop
-    muted
-    playsInline
-    className="absolute inset-0 w-full h-full object-cover brightness-110 contrast-125 saturate-125"
-  >
-    <source src="/globe.mp4" type="video/mp4" />
-  </video>
-</div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/60 to-black z-20" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+          >
+            <source src="/globe.mp4" type="video/mp4" />
+          </video>
+        </div>
 
         {/* Grain Overlay */}
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none grain-texture z-20" />

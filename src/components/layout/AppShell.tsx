@@ -202,7 +202,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   <div className="flex flex-1 items-center min-w-0 animate-in fade-in slide-in-from-left-2 duration-300">
                     <div className="flex-1 text-left leading-tight truncate">
                       <p className="text-sm font-semibold text-foreground truncate">
-                        Aditya Parmar
+                        researcher_01
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
                         Premium
