@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
  * PROXY MODE: Forwards polling requests to AWS backend to avoid CORS issues
  * 
  * Usage: GET /api/results/123e4567-e89b-12d3-a456-426614174000
- * Forwards to: GET https://48ih4pysre.execute-api.us-west-2.amazonaws.com/dev/results/123e4567-e89b-12d3-a456-426614174000
+ * Forwards to: GET https://{base}/api/results/{job_id}
  */
 
 const AWS_API_URL = process.env.NEXT_PUBLIC_API_URL || 
@@ -23,7 +23,7 @@ export async function GET(
     console.log(`[API Proxy] /api/results/${job_id} - Forwarding to AWS...`);
 
     // Forward to AWS backend (server-to-server, no CORS issues!)
-    const awsUrl = `${AWS_API_URL}/results/${job_id}`;
+    const awsUrl = `${AWS_API_URL}/api/results/${job_id}`;
     console.log(`[API Proxy] GET ${awsUrl}`);
 
     const awsResponse = await fetch(awsUrl, {

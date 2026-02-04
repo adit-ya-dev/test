@@ -1,23 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import type { DashboardStats } from "@/types/analysis";
+import { useJobHistory } from "@/hooks/useJobHistory";
+import { computeDashboardStats } from "@/lib/jobs/metrics";
 
 export function useDashboardStats() {
-  const [data, setData] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { history } = useJobHistory();
 
-  useEffect(() => {
-    async function run() {
-      setLoading(true);
-      const res = await fetch("/api/dashboard");
-      const json = await res.json();
-      setData(json);
-      setLoading(false);
-    }
+  const data: DashboardStats = useMemo(
+    () => computeDashboardStats(history),
+    [history],
+  );
 
-    run();
-  }, []);
-
-  return { data, loading };
+  return { data, loading: false };
 }

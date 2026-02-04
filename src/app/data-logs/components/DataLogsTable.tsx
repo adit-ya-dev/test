@@ -1,9 +1,9 @@
 "use client";
 
-import type { ScanResult } from "@/types/scan";
+import type { JobHistoryItem } from "@/types/jobs";
 import Link from "next/link";
 
-export default function DataLogsTable({ logs }: { logs: ScanResult[] }) {
+export default function DataLogsTable({ logs }: { logs: JobHistoryItem[] }) {
   return (
     <div className="bg-card border border-border rounded-2xl p-5 shadow-sm overflow-hidden">
       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">
@@ -15,16 +15,16 @@ export default function DataLogsTable({ logs }: { logs: ScanResult[] }) {
           <thead className="bg-muted text-muted-foreground border-b border-border">
             <tr>
               <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
-                Scan ID
+                Job ID
               </th>
               <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
-                Region
+                Coordinates
               </th>
               <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
-                Severity
+                Date Range
               </th>
               <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
-                Timestamp
+                Status
               </th>
               <th className="text-left p-4 font-bold uppercase text-[10px] tracking-wider">
                 Action
@@ -45,33 +45,37 @@ export default function DataLogsTable({ logs }: { logs: ScanResult[] }) {
             ) : (
               logs.map((s) => (
                 <tr
-                  key={s.scanId}
+                  key={s.job_id}
                   className="text-foreground/80 hover:bg-muted/50 transition-colors"
                 >
                   <td className="p-4 font-mono font-bold text-xs">
-                    {s.scanId}
+                    {s.job_id}
                   </td>
-                  <td className="p-4 font-semibold">{s.regionName}</td>
+                  <td className="p-4 font-semibold">
+                    {s.coordinates.lat.toFixed(3)}, {s.coordinates.lon.toFixed(3)}
+                  </td>
+                  <td className="p-4">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {s.start_year} → {s.end_year}
+                    </span>
+                  </td>
                   <td className="p-4">
                     <span
                       className={[
                         "px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tighter",
-                        s.severity === "CRITICAL"
+                        s.status === "Failed"
                           ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
-                          : s.severity === "WARNING"
-                            ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20"
-                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+                          : s.status === "Completed"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                            : "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
                       ].join(" ")}
                     >
-                      {s.severity}
+                      {s.status}
                     </span>
-                  </td>
-                  <td className="p-4 text-muted-foreground text-xs">
-                    {new Date(s.createdAt).toLocaleString()}
                   </td>
                   <td className="p-4">
                     <Link
-                      href="/scan-result"
+                      href={`/scan-result?job_id=${s.job_id}`}
                       className="rounded-lg border border-border bg-secondary px-4 py-2 text-[10px] font-black uppercase tracking-widest text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-all inline-block shadow-sm"
                     >
                       View

@@ -1,13 +1,13 @@
 "use client";
 
-import type { ScanResult } from "@/types/scan";
+import type { JobHistoryItem } from "@/types/jobs";
 import { downloadJson } from "@/lib/download/downloadFile";
 
 export default function DataLogsActions({
   logs,
   onClearAll,
 }: {
-  logs: ScanResult[];
+  logs: JobHistoryItem[];
   onClearAll: () => void;
 }) {
   return (

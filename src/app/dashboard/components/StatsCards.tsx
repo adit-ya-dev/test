@@ -1,35 +1,34 @@
 "use client";
 
 import { useDashboardStats } from "@/hooks/useDashboardStats";
-import { formatNdvi, formatPercent } from "@/lib/utils/format";
-import { Leaf, TrendingDown, Building2, Activity } from "lucide-react";
+import { Activity, AlertTriangle, Map, TrendingUp } from "lucide-react";
 
 export default function StatsCards() {
   const { data, loading } = useDashboardStats();
 
   const stats = [
     {
-      label: "Mean NDVI",
-      value: data ? formatNdvi(data.meanNdvi) : "--",
-      icon: Leaf,
+      label: "Total Scans",
+      value: String(data.totalScans),
+      icon: Activity,
       color: "text-emerald-500",
     },
     {
-      label: "Forest Loss",
-      value: data ? formatPercent(data.forestLossPercent) : "--",
-      icon: TrendingDown,
+      label: "Active Threats",
+      value: String(data.activeThreats),
+      icon: AlertTriangle,
       color: "text-rose-500",
     },
     {
-      label: "Urban Gain",
-      value: data ? formatPercent(data.urbanGainPercent) : "--",
-      icon: Building2,
+      label: "Area Monitored",
+      value: `${data.areaMonitoredKm2.toFixed(1)} km2`,
+      icon: Map,
       color: "text-blue-500",
     },
     {
-      label: "Scans Today",
-      value: data ? String(data.scansToday) : "--",
-      icon: Activity,
+      label: "Recent Changes",
+      value: String(data.recentChanges),
+      icon: TrendingUp,
       color: "text-amber-500",
     },
   ];

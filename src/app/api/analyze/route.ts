@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 /**
  * API Route: /api/analyze
- * 
+ *
  * PROXY MODE: Forwards requests to AWS backend to avoid CORS issues
  * The browser calls this same-origin endpoint, and the Next.js server
  * forwards the request to AWS (server-to-server has no CORS restrictions)
@@ -21,9 +21,9 @@ export async function POST(req: Request) {
     console.log("[API Proxy] Request body:", body);
 
     // Forward to AWS backend (server-to-server, no CORS issues!)
-    console.log(`[API Proxy] POST ${AWS_API_URL}/analyze`);
-    
-    const awsResponse = await fetch(`${AWS_API_URL}/analyze`, {
+    console.log(`[API Proxy] POST ${AWS_API_URL}/api/analyze`);
+
+    const awsResponse = await fetch(`${AWS_API_URL}/api/analyze`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

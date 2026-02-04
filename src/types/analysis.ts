@@ -52,13 +52,10 @@ export interface AnalysisImages {
  * Dashboard statistics for overview page
  */
 export interface DashboardStats {
-  meanNdvi: number;
-  forestLossPercent: number;
-  urbanGainPercent: number;
-  scansToday: number;
   totalScans: number;
-  activeAlerts: number;
-  criticalAlerts: number;
+  activeThreats: number;
+  areaMonitoredKm2: number;
+  recentChanges: number;
 }
 
 /**

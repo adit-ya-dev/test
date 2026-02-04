@@ -1,27 +1,53 @@
 "use client";
+
 import { AlertTriangle, TrendingDown, Activity } from "lucide-react";
+import { useJobHistory } from "@/hooks/useJobHistory";
+import { computeThreatMetrics } from "@/lib/jobs/metrics";
 
 export default function ThreatLevelCard() {
-  const metrics = [
+  const { history } = useJobHistory();
+  const metrics = computeThreatMetrics(history);
+
+  const severityLabel =
+    metrics.recentRate >= 0.5
+      ? "CRITICAL"
+      : metrics.recentRate >= 0.25
+        ? "HIGH"
+        : metrics.recentRate >= 0.1
+          ? "ELEVATED"
+          : "LOW";
+
+  const severityColor =
+    severityLabel === "CRITICAL"
+      ? "text-destructive"
+      : severityLabel === "HIGH"
+        ? "text-rose-500"
+        : severityLabel === "ELEVATED"
+          ? "text-amber-500"
+          : "text-emerald-500";
+
+  const details = [
     {
-      label: "Forest Loss",
-      val: "24%",
+      label: "High Severity Rate",
+      val: `${Math.round(metrics.recentRate * 100)}%`,
       icon: TrendingDown,
       color: "text-rose-500",
     },
     {
-      label: "NDVI Drop",
-      val: "0.31",
+      label: "Jobs (30d)",
+      val: String(metrics.recentJobs),
       icon: Activity,
       color: "text-amber-500",
     },
     {
-      label: "Alert Confidence",
-      val: "0.92",
+      label: "Active Threats",
+      val: String(metrics.recentHigh),
       icon: AlertTriangle,
       color: "text-orange-500",
     },
   ];
+
+  const hasRecent = metrics.recentJobs > 0;
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm h-full">
@@ -29,16 +55,22 @@ export default function ThreatLevelCard() {
         Threat Level
       </p>
       <div className="space-y-1">
-        <h2 className="text-4xl font-black tracking-tighter text-destructive">
-          CRITICAL
+        <h2 className={`text-4xl font-black tracking-tighter ${severityColor}`}>
+          {severityLabel}
         </h2>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Forest → Urban transition exceeded{" "}
-          <span className="text-foreground font-bold">20%</span> threshold.
+          {hasRecent ? (
+            <>
+              Based on last 30 days. Trend:{" "}
+              <span className="text-foreground font-bold">{metrics.trend}</span>
+            </>
+          ) : (
+            <>No completed jobs in the last 30 days.</>
+          )}
         </p>
       </div>
       <div className="mt-8 space-y-4">
-        {metrics.map((item, i) => (
+        {details.map((item, i) => (
           <div
             key={i}
             className="flex items-center justify-between border-b border-border pb-2"

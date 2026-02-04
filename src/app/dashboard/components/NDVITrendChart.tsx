@@ -8,17 +8,60 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { useMemo } from "react";
+import { useJobHistory } from "@/hooks/useJobHistory";
 
-const data = [
-  { month: "Jan", ndvi: 0.62 },
-  { month: "Feb", ndvi: 0.58 },
-  { month: "Mar", ndvi: 0.52 },
-  { month: "Apr", ndvi: 0.44 },
-  { month: "May", ndvi: 0.39 },
-  { month: "Jun", ndvi: 0.32 },
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
+function buildSeries() {
+  const now = new Date();
+  const series: { month: string; changes: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    series.push({ month: MONTHS[d.getMonth()], changes: 0 });
+  }
+  return series;
+}
+
 export default function NDVITrendChart() {
+  const { history } = useJobHistory();
+
+  const data = useMemo(() => {
+    const series = buildSeries();
+    const now = new Date();
+    const cutoff = new Date(now.getFullYear(), now.getMonth() - 5, 1).getTime();
+
+    history.forEach((job) => {
+      if (job.status !== "Completed" || !job.results_summary) return;
+      const ts = new Date(job.updated_at || job.created_at).getTime();
+      if (Number.isNaN(ts) || ts < cutoff) return;
+      const date = new Date(ts);
+      const monthIndex = date.getMonth();
+      const label = MONTHS[monthIndex];
+      const bucket = series.find((s) => s.month === label);
+      if (bucket) {
+        bucket.changes += job.results_summary.total_changes || 0;
+      }
+    });
+
+    return series;
+  }, [history]);
+
+  const hasData = data.some((d) => d.changes > 0);
+
   return (
     <div
       className="h-full rounded-2xl border border-border bg-card
@@ -73,7 +116,7 @@ export default function NDVITrendChart() {
             />
 
             <YAxis
-              domain={[0, 1]}
+              domain={[0, "auto"]}
               axisLine={false}
               tickLine={false}
               width={32}
@@ -81,7 +124,7 @@ export default function NDVITrendChart() {
                 fill: "hsl(var(--muted-foreground))",
                 fontSize: 10,
               }}
-              tickFormatter={(v) => v.toFixed(1)}
+              tickFormatter={(v) => `${v}`}
             />
 
             <Tooltip
@@ -98,7 +141,7 @@ export default function NDVITrendChart() {
 
             <Line
               type="monotone"
-              dataKey="ndvi"
+              dataKey="changes"
               stroke="#10b981"
               strokeWidth={3}
               dot={{ r: 4 }}
@@ -107,6 +150,12 @@ export default function NDVITrendChart() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        {hasData
+          ? "Derived from recent change activity"
+          : "Historical trends coming soon"}
+      </p>
     </div>
   );
 }

@@ -22,20 +22,20 @@ export default function DataLogsFilters({
       <input
         value={filters.query}
         onChange={(e) => onChange({ ...filters, query: e.target.value })}
-        placeholder="Search by Scan ID or Region..."
+        placeholder="Search by Job ID or Coordinates..."
         className="w-full md:w-[320px] rounded-xl border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
       />
 
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Severity */}
+        {/* Status */}
         <Select
-          value={filters.severity}
+          value={filters.status}
           onValueChange={(value) =>
-            onChange({ ...filters, severity: value as any })
+            onChange({ ...filters, status: value as any })
           }
         >
           <SelectTrigger className="w-[180px] rounded-xl bg-background">
-            <SelectValue placeholder="All Severity" />
+            <SelectValue placeholder="All Status" />
           </SelectTrigger>
 
           <SelectContent
@@ -43,10 +43,11 @@ export default function DataLogsFilters({
             sideOffset={6}
             className="w-[var(--radix-select-trigger-width)] rounded-xl border border-border bg-popover shadow-lg"
           >
-            <SelectItem value="ALL">All Severity</SelectItem>
-            <SelectItem value="LOW">LOW</SelectItem>
-            <SelectItem value="WARNING">WARNING</SelectItem>
-            <SelectItem value="CRITICAL">CRITICAL</SelectItem>
+            <SelectItem value="ALL">All Status</SelectItem>
+            <SelectItem value="Queued">Queued</SelectItem>
+            <SelectItem value="Processing">Processing</SelectItem>
+            <SelectItem value="Completed">Completed</SelectItem>
+            <SelectItem value="Failed">Failed</SelectItem>
           </SelectContent>
         </Select>
 

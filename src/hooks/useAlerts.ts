@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { Alert, AlertSeverity } from "@/types/alert";
-import { generateAlertsFromScans } from "@/lib/alerts/alertGenerator";
-import { getScanHistory } from "@/lib/scans/scanStorage";
+import { generateAlertsFromJobs } from "@/lib/alerts/alertGenerator";
+import { getJobHistory } from "@/lib/jobs/jobStorage";
 
 export function useAlerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -11,13 +11,22 @@ export function useAlerts() {
   const [severity, setSeverity] = useState<"ALL" | AlertSeverity>("ALL");
 
   useEffect(() => {
-    setLoading(true);
+    const refresh = () => {
+      setLoading(true);
+      const jobs = getJobHistory();
+      const generated = generateAlertsFromJobs(jobs);
+      setAlerts(Array.isArray(generated) ? generated : []);
+      setLoading(false);
+    };
 
-    const scans = getScanHistory();
-    const generated = generateAlertsFromScans(scans);
+    refresh();
+    window.addEventListener("job-history-updated", refresh);
+    window.addEventListener("storage", refresh);
 
-    setAlerts(Array.isArray(generated) ? generated : []);
-    setLoading(false);
+    return () => {
+      window.removeEventListener("job-history-updated", refresh);
+      window.removeEventListener("storage", refresh);
+    };
   }, []);
 
   const filtered =

@@ -2,18 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { DataLogsFilters } from "@/types/dataLogs";
-import type { ScanResult } from "@/types/scan";
 import { getFilteredLogs } from "@/lib/data-logs/dataLogsService";
-import { clearScanHistory } from "@/lib/scans/scanStorage";
+import type { JobHistoryItem } from "@/types/jobs";
+import { clearJobHistory } from "@/lib/jobs/jobStorage";
 
 export function useDataLogs() {
   const [filters, setFilters] = useState<DataLogsFilters>({
     query: "",
-    severity: "ALL",
+    status: "ALL",
     sort: "NEWEST",
   });
 
-  const [logs, setLogs] = useState<ScanResult[]>([]);
+  const [logs, setLogs] = useState<JobHistoryItem[]>([]);
 
   const refresh = () => {
     const data = getFilteredLogs(filters);
@@ -23,12 +23,12 @@ export function useDataLogs() {
   useEffect(() => {
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.query, filters.severity, filters.sort]);
+  }, [filters.query, filters.status, filters.sort]);
 
   const total = useMemo(() => logs.length, [logs]);
 
   const clearAll = () => {
-    clearScanHistory();
+    clearJobHistory();
     setLogs([]);
   };
 

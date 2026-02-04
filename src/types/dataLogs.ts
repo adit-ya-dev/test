@@ -1,13 +1,12 @@
-import type { ScanResult, ScanSeverity } from "@/types/scan";
+import type { JobHistoryItem, JobStatus } from "@/types/jobs";
 
 export type DataLogsResponse = {
   total: number;
-  logs: ScanResult[];
+  logs: JobHistoryItem[];
 };
-
 
 export type DataLogsFilters = {
   query: string;
-  severity: "ALL" | ScanSeverity;
+  status: "ALL" | JobStatus;
   sort: "NEWEST" | "OLDEST";
 };

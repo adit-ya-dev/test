@@ -1,18 +1,20 @@
 import type { Alert } from "@/types/alert";
-import type { ScanResult } from "@/types/scan";
+import type { JobHistoryItem } from "@/types/jobs";
 
-export function generateAlertsFromScans(scans: unknown): Alert[] {
-  if (!Array.isArray(scans)) return [];
+export function generateAlertsFromJobs(jobs: unknown): Alert[] {
+  if (!Array.isArray(jobs)) return [];
 
   const alerts: Alert[] = [];
 
-  for (const scan of scans as ScanResult[]) {
-    if (!scan?.scanId) continue;
+  for (const job of jobs as JobHistoryItem[]) {
+    if (!job?.job_id || !job.results_summary) continue;
 
-    const { scanId, createdAt, regionName } = scan;
+    const summary = job.results_summary;
+    const scanId = job.job_id;
+    const createdAt = job.created_at;
+    const regionName = `${job.coordinates.lat.toFixed(2)}, ${job.coordinates.lon.toFixed(2)}`;
 
-    // 🔴 CRITICAL: Forest Loss
-    if (scan.transitions?.forestToUrbanPercent >= 20) {
+    if (summary.deforestation_km2 >= 300) {
       alerts.push({
         id: `${scanId}-DEF`,
         scanId,
@@ -20,7 +22,9 @@ export function generateAlertsFromScans(scans: unknown): Alert[] {
         severity: "CRITICAL",
         type: "DEFORESTATION",
         title: "Severe Deforestation Detected",
-        description: `${scan.transitions.forestToUrbanPercent}% forest area converted to urban land.`,
+        description: `${summary.deforestation_km2.toFixed(
+          1,
+        )} km² deforestation detected.`,
         regionName,
         recommendation: [
           "Immediate field verification required",
@@ -28,46 +32,38 @@ export function generateAlertsFromScans(scans: unknown): Alert[] {
           "Initiate legal investigation",
         ],
       });
-    }
-
-    // 🟡 WARNING: NDVI Drop
-    if (scan.ndvi?.mean !== undefined && scan.ndvi.mean < 0.3) {
+    } else if (summary.deforestation_km2 >= 100) {
       alerts.push({
-        id: `${scanId}-NDVI`,
+        id: `${scanId}-DEF`,
         scanId,
         createdAt,
         severity: "WARNING",
-        type: "NDVI_DROP",
-        title: "Vegetation Health Decline",
-        description: `NDVI mean dropped to ${scan.ndvi.mean.toFixed(2)}.`,
+        type: "DEFORESTATION",
+        title: "Deforestation Increase",
+        description: `${summary.deforestation_km2.toFixed(
+          1,
+        )} km² deforestation detected.`,
         regionName,
-        recommendation: [
-          "Monitor vegetation trend",
-          "Check for drought or human interference",
-        ],
+        recommendation: ["Monitor affected zones", "Verify land-use changes"],
       });
     }
 
-    // 🟠 WARNING: Urban Expansion
-    const expansion = scan.transitions?.urbanExpansionPercent;
-
-    if (expansion !== undefined && expansion >= 15) {
+    if (summary.urban_expansion_km2 >= 50) {
       alerts.push({
         id: `${scanId}-URBAN`,
         scanId,
         createdAt,
         severity: "WARNING",
         type: "URBAN_EXPANSION",
-        title: "Rapid Urban Expansion",
-        description: `${expansion}% increase in urban area detected.`,
+        title: "Urban Expansion Spike",
+        description: `${summary.urban_expansion_km2.toFixed(
+          1,
+        )} km² urban expansion detected.`,
         regionName,
-        recommendation: [
-          "Review zoning permissions",
-          "Assess environmental impact",
-        ],
+        recommendation: ["Review zoning permissions", "Assess impact areas"],
       });
     }
-  } // <--- This was the missing brace closing the 'for' loop
+  }
 
   return alerts.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),

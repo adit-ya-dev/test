@@ -3,13 +3,10 @@ import type { Alert } from "@/types/alert"; // Changed from AlertItem
 import type { DashboardStats } from "@/types/analysis";
 
 export const mockDashboardStats: DashboardStats = {
-  meanNdvi: 0.42,
-  forestLossPercent: 24,
-  urbanGainPercent: 13,
-  scansToday: 8,
-  totalScans: 156,
-  activeAlerts: 12,
-  criticalAlerts: 3,
+  totalScans: 12,
+  activeThreats: 3,
+  areaMonitoredKm2: 842.5,
+  recentChanges: 156,
 };
 
 export const mockRecentScans: Scan[] = [

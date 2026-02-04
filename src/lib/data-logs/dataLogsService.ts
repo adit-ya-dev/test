@@ -1,15 +1,15 @@
-import type { ScanResult } from "@/types/scan";
+import type { JobHistoryItem } from "@/types/jobs";
 import type { DataLogsFilters } from "@/types/dataLogs";
-import { getScanHistory } from "@/lib/scans/scanStorage";
+import { getJobHistory } from "@/lib/jobs/jobStorage";
 
-export function getFilteredLogs(filters: DataLogsFilters): ScanResult[] {
-  const history = getScanHistory();
+export function getFilteredLogs(filters: DataLogsFilters): JobHistoryItem[] {
+  const history = getJobHistory();
 
   let logs = [...history];
 
-  // filter severity
-  if (filters.severity !== "ALL") {
-    logs = logs.filter((s) => s.severity === filters.severity);
+  // filter status
+  if (filters.status !== "ALL") {
+    logs = logs.filter((s) => s.status === filters.status);
   }
 
   // search query
@@ -17,15 +17,15 @@ export function getFilteredLogs(filters: DataLogsFilters): ScanResult[] {
     const q = filters.query.toLowerCase();
     logs = logs.filter(
       (s) =>
-        s.scanId.toLowerCase().includes(q) ||
-        s.regionName.toLowerCase().includes(q),
+        s.job_id.toLowerCase().includes(q) ||
+        `${s.coordinates.lat},${s.coordinates.lon}`.includes(q),
     );
   }
 
   // sort
   logs.sort((a, b) => {
-    const t1 = new Date(a.createdAt).getTime();
-    const t2 = new Date(b.createdAt).getTime();
+    const t1 = new Date(a.created_at).getTime();
+    const t2 = new Date(b.created_at).getTime();
     return filters.sort === "NEWEST" ? t2 - t1 : t1 - t2;
   });
 

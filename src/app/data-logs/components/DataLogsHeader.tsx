@@ -6,8 +6,8 @@ export default function DataLogsHeader({ total }: { total: number }) {
       </h1>
 
       <p className="mt-1 text-sm font-bold text-muted-foreground uppercase tracking-wider">
-        Scan History Records <span className="mx-1 opacity-30">•</span>
-        Total scans saved: <span className="text-primary">{total}</span>
+        Job History Records <span className="mx-1 opacity-30">-</span>
+        Total jobs saved: <span className="text-primary">{total}</span>
       </p>
     </div>
   );
