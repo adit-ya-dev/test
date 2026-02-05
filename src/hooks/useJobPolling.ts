@@ -9,6 +9,8 @@ export function useJobPolling(jobId: string | null) {
   const [status, setStatus] = useState<JobStatusResponse | null>(null);
   const [results, setResults] = useState<JobResultsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [queuedSince, setQueuedSince] = useState<number | null>(null);
+  const pollRef = useState<{ fn?: () => Promise<void> }>({})[0];
 
   useEffect(() => {
     if (!jobId) return;
@@ -19,40 +21,62 @@ export function useJobPolling(jobId: string | null) {
     const poll = async () => {
       try {
         const statusData = await getJobStatus(jobId);
+        const normalizedStatus =
+          statusData.status === "COMPLETED" ? "Completed" : statusData.status;
+        const normalized = { ...statusData, status: normalizedStatus };
         if (!mounted) return;
 
-        setStatus(statusData);
+        setStatus(normalized);
+        if (normalized.status === "Queued") {
+          setQueuedSince((prev) => prev ?? Date.now());
+        } else {
+          setQueuedSince(null);
+        }
         const existing = getJobById(jobId);
         upsertJob({
-          job_id: statusData.job_id,
-          status: statusData.status,
-          progress: statusData.progress ?? 0,
-          message: statusData.message || "",
-          coordinates: statusData.coordinates,
-          start_year: statusData.start_year,
-          end_year: statusData.end_year,
+          job_id: normalized.job_id,
+          status: normalized.status,
+          progress: normalized.progress ?? 0,
+          message: normalized.message || "",
+          coordinates:
+            normalized.coordinates ||
+            existing?.coordinates || { lat: 0, lon: 0 },
+          start_year: normalized.start_year ?? existing?.start_year ?? 0,
+          end_year: normalized.end_year ?? existing?.end_year ?? 0,
           change_types: existing?.change_types ?? [],
           created_at: existing?.created_at ?? new Date().toISOString(),
           updated_at: new Date().toISOString(),
           results_summary: existing?.results_summary,
         });
 
-        if (statusData.status === "Completed") {
+        if (normalized.status === "Completed") {
           const resultsData = await getJobResults(jobId);
           setResults(resultsData);
           const existingAfter = getJobById(jobId);
+          const deforestation = resultsData.statistics.deforestation_area_km2 || 0;
+          const urban = resultsData.statistics.urban_expansion_km2 || 0;
           upsertJob({
             job_id: resultsData.job_id,
             status: "Completed",
             progress: 100,
             message: "Completed",
-            coordinates: statusData.coordinates,
-            start_year: statusData.start_year,
-            end_year: statusData.end_year,
+            coordinates:
+              normalized.coordinates ||
+              existingAfter?.coordinates ||
+              resultsData.coordinates || { lat: 0, lon: 0 },
+            start_year:
+              normalized.start_year ?? existingAfter?.start_year ?? 0,
+            end_year: normalized.end_year ?? existingAfter?.end_year ?? 0,
             change_types: existingAfter?.change_types ?? [],
             created_at: existingAfter?.created_at ?? new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            results_summary: resultsData.results.statistics,
+            results_summary: {
+              total_area_changed_km2: deforestation + urban,
+              deforestation_km2: deforestation,
+              urban_expansion_km2: urban,
+              total_changes: resultsData.total_changes ?? 0,
+              encroachment_km2: 0,
+            },
           });
 
           if (interval) clearInterval(interval);
@@ -67,6 +91,7 @@ export function useJobPolling(jobId: string | null) {
       }
     };
 
+    pollRef.fn = poll;
     poll();
     interval = setInterval(poll, 5000);
 
@@ -88,5 +113,9 @@ export function useJobPolling(jobId: string | null) {
     isProcessing,
     isCompleted,
     progress,
+    queuedSince,
+    refresh: async () => {
+      if (pollRef.fn) await pollRef.fn();
+    },
   };
 }

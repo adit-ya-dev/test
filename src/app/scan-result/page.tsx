@@ -24,8 +24,16 @@ function ProgressBar({ value }: { value: number }) {
 export default function ScanResultPage() {
   const params = useSearchParams();
   const jobId = params.get("job_id");
-  const { status, results, error, progress, isProcessing, isCompleted } =
-    useJobPolling(jobId);
+  const {
+    status,
+    results,
+    error,
+    progress,
+    isProcessing,
+    isCompleted,
+    queuedSince,
+    refresh,
+  } = useJobPolling(jobId);
   const { history } = useJobHistory();
 
   const jobFromHistory = useMemo(() => {
@@ -34,10 +42,9 @@ export default function ScanResultPage() {
   }, [history, jobId]);
 
   const topChanges = useMemo(() => {
-    if (!results?.results.changes) return [];
-    return [...results.results.changes]
-      .sort((a, b) => b.area_km2 - a.area_km2)
-      .slice(0, 10);
+    const changes = results?.top_changes;
+    if (!changes || !Array.isArray(changes)) return [];
+    return [...changes].sort((a, b) => b.area_km2 - a.area_km2).slice(0, 10);
   }, [results]);
 
   if (!jobId) {
@@ -85,10 +92,50 @@ export default function ScanResultPage() {
           )}
 
           {isProcessing && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              We are processing satellite imagery. Results will appear
-              automatically when ready.
-            </p>
+            <div className="mt-3 space-y-3">
+              <p className="text-sm text-muted-foreground">
+                We are processing satellite imagery. Results will appear
+                automatically when ready.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button variant="outline" onClick={refresh}>
+                  Refresh Status
+                </Button>
+              </div>
+              {status?.status === "Queued" && queuedSince && (
+                <>
+                  {Date.now() - queuedSince > 2 * 60 * 1000 && (
+                    <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-700 dark:text-yellow-300">
+                      Job is taking longer than expected. The backend may be
+                      processing a backlog. Current status: QUEUED
+                    </div>
+                  )}
+                  {Date.now() - queuedSince > 5 * 60 * 1000 && (
+                    <div className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground space-y-3">
+                      <div>
+                        Job appears stuck. This usually means:
+                      </div>
+                      <ul className="list-disc list-inside text-sm">
+                        <li>Backend worker is not running</li>
+                        <li>Processing queue has issues</li>
+                        <li>Contact support with Job ID: {jobId}</li>
+                      </ul>
+                      <div className="flex flex-wrap gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => navigator.clipboard.writeText(jobId)}
+                        >
+                          Copy Job ID
+                        </Button>
+                        <Button variant="secondary" asChild>
+                          <Link href="/dashboard">Return to Dashboard</Link>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           )}
         </Card>
 
@@ -96,22 +143,29 @@ export default function ScanResultPage() {
           <>
             <JobSummaryPanel
               jobId={jobId}
-              coordinates={status?.coordinates || jobFromHistory?.coordinates}
+              coordinates={results.coordinates || status?.coordinates || jobFromHistory?.coordinates}
               startYear={status?.start_year || jobFromHistory?.start_year}
               endYear={status?.end_year || jobFromHistory?.end_year}
               changeTypes={jobFromHistory?.change_types}
               submittedAt={jobFromHistory?.created_at}
               completedAt={jobFromHistory?.updated_at}
+              totalChanges={results.total_changes}
+              changesByType={results.changes_by_type}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {(() => {
+              const deforestation = results.statistics.deforestation_area_km2 || 0;
+              const urban = results.statistics.urban_expansion_km2 || 0;
+              const encroachment = results.statistics.encroachment_km2 || 0;
+              const totalArea = deforestation + urban + encroachment;
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <Card className="p-4 rounded-2xl border border-border">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                   Total Area
                 </p>
                 <p className="text-2xl font-bold">
-                  {results.results.statistics.total_area_changed_km2.toFixed(1)}{" "}
-                  km2
+                  {totalArea.toFixed(1)} km2
                 </p>
               </Card>
               <Card className="p-4 rounded-2xl border border-border">
@@ -119,7 +173,7 @@ export default function ScanResultPage() {
                   Deforestation
                 </p>
                 <p className="text-2xl font-bold text-red-500">
-                  {results.results.statistics.deforestation_km2.toFixed(1)} km2
+                  {deforestation.toFixed(1)} km2
                 </p>
               </Card>
               <Card className="p-4 rounded-2xl border border-border">
@@ -127,7 +181,7 @@ export default function ScanResultPage() {
                   Urban Expansion
                 </p>
                 <p className="text-2xl font-bold text-blue-500">
-                  {results.results.statistics.urban_expansion_km2.toFixed(1)} km2
+                  {urban.toFixed(1)} km2
                 </p>
               </Card>
               <Card className="p-4 rounded-2xl border border-border">
@@ -135,7 +189,7 @@ export default function ScanResultPage() {
                   Encroachment
                 </p>
                 <p className="text-2xl font-bold text-amber-500">
-                  {results.results.statistics.encroachment_km2.toFixed(1)} km2
+                  {encroachment.toFixed(1)} km2
                 </p>
               </Card>
               <Card className="p-4 rounded-2xl border border-border">
@@ -143,14 +197,16 @@ export default function ScanResultPage() {
                   Total Changes
                 </p>
                 <p className="text-2xl font-bold">
-                  {results.results.statistics.total_changes}
+                  {results.total_changes}
                 </p>
               </Card>
-            </div>
+                </div>
+              );
+            })()}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <div className="lg:col-span-8 space-y-6">
-                <ChangeResultsMap results={results.results} />
+                <ChangeResultsMap results={results} />
 
                 <Card className="p-5 rounded-2xl border border-border">
                   <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground mb-4">
@@ -162,25 +218,21 @@ export default function ScanResultPage() {
                         <tr>
                           <th className="px-4 py-3 text-left">Type</th>
                           <th className="px-4 py-3 text-left">Area (km2)</th>
-                          <th className="px-4 py-3 text-left">Severity</th>
                           <th className="px-4 py-3 text-left">Coordinates</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
-                        {topChanges.map((change) => (
-                          <tr key={change.change_id}>
+                        {topChanges.map((change, idx) => (
+                          <tr key={`${change.type}-${idx}`}>
                             <td className="px-4 py-3 font-semibold">
                               {change.type}
                             </td>
                             <td className="px-4 py-3">
                               {change.area_km2.toFixed(2)}
                             </td>
-                            <td className="px-4 py-3 uppercase text-xs">
-                              {change.severity}
-                            </td>
                             <td className="px-4 py-3 text-xs text-muted-foreground">
-                              {change.coordinates.lat.toFixed(3)},{" "}
-                              {change.coordinates.lon.toFixed(3)}
+                              {change.location.lat.toFixed(3)},{" "}
+                              {change.location.lon.toFixed(3)}
                             </td>
                           </tr>
                         ))}
@@ -196,37 +248,26 @@ export default function ScanResultPage() {
                     Downloads
                   </p>
                   <div className="flex flex-col gap-3">
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        window.open(
-                          results.results.downloads.geojson_url,
-                          "_blank",
-                        )
-                      }
-                    >
-                      Download GeoJSON
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        window.open(results.results.downloads.csv_url, "_blank")
-                      }
-                    >
-                      Download CSV
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        window.open(
-                          results.results.downloads.summary_url,
-                          "_blank",
-                        )
-                      }
-                    >
-                      Download Summary
-                    </Button>
+                    {Object.entries(results.files || {}).map(
+                      ([filename, url]) => (
+                        <Button
+                          key={filename}
+                          variant="outline"
+                          onClick={() => window.open(url, "_blank")}
+                        >
+                          {filename}
+                        </Button>
+                      ),
+                    )}
+                    {Object.keys(results.files || {}).length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        No downloadable files available yet.
+                      </p>
+                    )}
                   </div>
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    File URLs expire in ~60 minutes.
+                  </p>
                 </Card>
               </div>
             </div>

@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 
 const items = [
   { color: "#ef4444", label: "Deforestation" },
-  { color: "#3b82f6", label: "Urban Expansion" },
+  { color: "#3b82f6", label: "Urban" },
   { color: "#f59e0b", label: "Encroachment" },
 ];
 

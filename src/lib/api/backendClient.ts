@@ -13,6 +13,10 @@
  * 3. S3 pre-signed URLs work with proper headers
  */
 
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://3y53hcmnt8.execute-api.us-west-2.amazonaws.com/dev/api";
+
 /**
  * Step 2: Upload Component
  * 

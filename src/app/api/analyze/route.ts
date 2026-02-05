@@ -8,9 +8,10 @@ import { NextResponse } from "next/server";
  * forwards the request to AWS (server-to-server has no CORS restrictions)
  */
 
-const AWS_API_URL = process.env.NEXT_PUBLIC_API_URL || 
-                    process.env.NEXT_PUBLIC_AWS_API_BASE ||
-                    "https://48ih4pysre.execute-api.us-west-2.amazonaws.com/dev";
+const AWS_API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_AWS_API_BASE ||
+  "https://48ih4pysre.execute-api.us-west-2.amazonaws.com/dev/api";
 
 export async function POST(req: Request) {
   try {
@@ -21,9 +22,9 @@ export async function POST(req: Request) {
     console.log("[API Proxy] Request body:", body);
 
     // Forward to AWS backend (server-to-server, no CORS issues!)
-    console.log(`[API Proxy] POST ${AWS_API_URL}/api/analyze`);
+    console.log(`[API Proxy] POST ${AWS_API_URL}/analyze`);
 
-    const awsResponse = await fetch(`${AWS_API_URL}/api/analyze`, {
+    const awsResponse = await fetch(`${AWS_API_URL}/analyze`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

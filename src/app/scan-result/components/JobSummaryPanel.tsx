@@ -19,6 +19,8 @@ export default function JobSummaryPanel({
   changeTypes,
   submittedAt,
   completedAt,
+  totalChanges,
+  changesByType,
 }: {
   jobId: string;
   coordinates?: { lat: number; lon: number };
@@ -27,6 +29,12 @@ export default function JobSummaryPanel({
   changeTypes?: ChangeType[];
   submittedAt?: string;
   completedAt?: string;
+  totalChanges?: number;
+  changesByType?: {
+    deforestation: number;
+    urban: number;
+    encroachment: number;
+  };
 }) {
   const locationLabel =
     coordinates && typeof coordinates.lat === "number"
@@ -77,6 +85,26 @@ export default function JobSummaryPanel({
               </Badge>
             ))
           )}
+        </div>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-muted-foreground">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
+              Total Changes
+            </p>
+            <p className="text-lg font-semibold text-foreground">
+              {totalChanges ?? 0}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
+              Changes by Type
+            </p>
+            <div className="mt-1 space-y-1">
+              <p>Deforestation: {changesByType?.deforestation ?? 0}</p>
+              <p>Urban: {changesByType?.urban ?? 0}</p>
+              <p>Encroachment: {changesByType?.encroachment ?? 0}</p>
+            </div>
+          </div>
         </div>
       </div>
     </Card>
