@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+
+
 import copy
 import hashlib
 import json
@@ -22,6 +24,7 @@ from supabase import create_client, Client
 from backend.env import load_env
 
 load_env()
+
 
 
 try:
